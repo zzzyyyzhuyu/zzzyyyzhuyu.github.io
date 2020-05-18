@@ -13,7 +13,7 @@
 #---------------------------
 favicon: /img/favicon.png # 网站标签页的 icon
 
-apple_touch_icon: /img/favicon.png # 用于苹果设备的 icon
+apple_touch_icon: /img/apple-touch-icon.png # 用于苹果设备的 icon
 
 title_join_string: ' - '  # 浏览器标签页中的标题分隔符，效果： 文章名 - 站点名
 
@@ -22,7 +22,7 @@ force_https: false  # 强制所有链接升级为 HTTPS（适用于图片等资�
 highlight: # 代码高亮
   enable: true
   style: 'Github Gist'  # 高亮样式见：https://highlightjs.org/static/demo/  在页面挑选 style 填入
-  bg_color: false  # 是否根据 style 改变代码背景色，**如果 style 是深色背景别忘了开启此项**
+  bg_color: false  # 是否根据 style 改变代码背景色，如果 style 是白色背景最好关闭此项
   copy_btn: true  # 是否开启复制代码的按钮
 
 fun_features: # 一些好玩的功能
@@ -92,8 +92,8 @@ aplayer:  # 音乐播放器，注意不能与 hexo-tag-aplayer 插件共用
     - { name: 'name', artist: 'artist', url: '/songs/test.mp3', cover: '/img/cover.jpg' }
     - { name: 'name', artist: 'artist', url: 'https://...url.mp3', cover: 'https://...cover.jpg' }
 
-version:  # 主题版本相关
-  check: flase  # 每次生成页面后，检测主题是否为最新版本
+version:  # 版本相关
+  check: true  # 每次生成检测是否为最新版本
 
 #---------------------------
 # 页头
@@ -109,7 +109,7 @@ navbar:
     - { key: 'about', link: '/about/', icon: 'iconfont icon-user-fill' }
     #- { key: 'links', link: '/links/', icon: 'iconfont icon-link-fill' }  # 友链页，把前面#去掉即可展示
 
-search: # 搜索栏，基于 hexo-generator-search 插件，若已安装其他搜索插件请关闭此功能，以避免生成多余的索引文件。
+search: # 搜索栏
   enable: true
   path: /local-search.xml # 文件引用地址，默认是下方生成位置，也可以将生成后的 local-search.xml 上传到其它位置引用，如：https://www.example.com/local-search.xml
   generate_path: /local-search.xml # 文件生成位置，必须为相对位置
@@ -338,8 +338,8 @@ about:  # 关于页需要手动创建，具体请见：https://hexo.fluid-dev.co
   subtitle:  # 打字机内容
   avatar: /img/avatar.png # 头像
   name: myname
-  introduce: '一句简短的介绍' # 支持 HTML
-  icons: # 更多图标可从 https://hexo.fluid-dev.com/docs/icon/ 查找，class 代表图标的 css class
+  introduce: info / info / info # 支持 HTML
+  icons: # 更多图标可从 https://github.com/fluid-dev/static/blob/master/hexo-theme-fluid/iconfont.png 查找，class 代表图标的 css class
     - { class: 'iconfont icon-github-fill', link: 'https://github.com' }
     - { class: 'iconfont icon-douban-fill', link: 'https://douban.com' }
     - { class: 'iconfont icon-wechat-fill', qrcode: '/img/favicon.png' }  # 添加 qrcode 后，点击不再跳转，而是悬浮二维码，需要指定 image

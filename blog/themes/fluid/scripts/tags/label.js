@@ -2,7 +2,7 @@
 
 'use strict';
 
-const label = (args) => {
+const postLabel = (args) => {
   args = args.join(' ').split('@');
   const classes = args[0] || 'default';
   const text = args[1] || '';
@@ -12,5 +12,5 @@ const label = (args) => {
   return `<span class="label label-${classes.trim()}">${text}</span>`;
 };
 
-// {% label class @text %}
-hexo.extend.tag.register('label', label, { ends: false });
+// {% label [class...] @text %}
+hexo.extend.tag.register('label', postLabel, { ends: false });

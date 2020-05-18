@@ -18,7 +18,11 @@ module.exports = (hexo) => {
     }
   };
 
-  https.get('https://api.github.com/repos/fluid-dev/hexo-theme-fluid/releases/latest', (res) => {
+  https.get('https://api.github.com/repos/fluid-dev/hexo-theme-fluid/releases/latest', {
+    headers: {
+      'User-Agent': 'Theme Fluid Client'
+    }
+  }, (res) => {
     let result = '';
     res.on('data', data => {
       result += data;

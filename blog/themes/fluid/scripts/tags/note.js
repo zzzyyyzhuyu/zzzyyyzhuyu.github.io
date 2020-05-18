@@ -2,7 +2,7 @@
 
 'use strict';
 
-const note = (args, content) => {
+const postNote = (args, content) => {
   if (!args || !args[0]) {
     args = ['primary'];
   }
@@ -12,8 +12,8 @@ const note = (args, content) => {
 };
 
 /*
-  {% note class %}
+  {% note [class...] %}
   text
   {% endnote %}
  */
-hexo.extend.tag.register('note', note, { ends: true });
+hexo.extend.tag.register('note', postNote, { ends: true });

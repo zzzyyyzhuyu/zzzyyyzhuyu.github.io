@@ -1,21 +1,18 @@
 'use strict';
 
-const objUtil = require('../../utils/object');
-
 module.exports = (hexo) => {
-  const config = hexo.theme.config;
+  var config = hexo.theme.config;
   if (!config.highlight.enable) {
     return;
   }
 
   // Force set hexo config
-  hexo.config.highlight = objUtil.merge({}, hexo.config.highlight, {
+  hexo.config.highlight = {
     enable     : true,
     hljs       : true,
     line_number: false,
-    wrap       : false,
-    auto_detect: true
-  });
+    wrap       : false
+  };
 
   if (config.highlight.bg_color) {
     hexo.extend.filter.register('after_render:html', (html, data) => {

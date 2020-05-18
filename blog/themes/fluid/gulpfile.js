@@ -17,7 +17,7 @@ gulp.task('lint:ejs', shell.task([
 ]));
 
 gulp.task('validate:config', cb => {
-  const themeConfig = fs.readFileSync(path.join(__dirname, 'fluid_config.yml'));
+  const themeConfig = fs.readFileSync(path.join(__dirname, '_config.yml'));
 
   try {
     yaml.safeLoad(themeConfig);
