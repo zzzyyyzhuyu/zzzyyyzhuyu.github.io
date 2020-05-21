@@ -2,6 +2,10 @@
 title: docker compose
 date: 2020-05-19 13:42:24
 index_img: https://www.ruanyifeng.com/blogimg/asset/2018/bg2018021311.jpg
+categories:
+    - 容器化相关
+tags:
+    - docker-compose
 ---
 
 # docker compose初识

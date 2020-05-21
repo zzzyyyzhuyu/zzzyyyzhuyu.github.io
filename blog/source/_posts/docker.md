@@ -2,6 +2,10 @@
 title: docker
 date: 2020-05-18 16:08:24
 index_img: https://www.runoob.com/wp-content/uploads/2016/04/docker01.png
+categories:
+     - 容器化相关
+tags: 
+     - docker
 ---
 
 
