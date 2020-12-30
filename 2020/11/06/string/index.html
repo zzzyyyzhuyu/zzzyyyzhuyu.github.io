@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/favicon.png">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="ever ever ever">
+  <meta name="author" content="Wimp">
+  <meta name="keywords" content="">
+  <title>String类探究 - Wimp</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_fmb4a04yx8h.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Wimp</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              <i class="iconfont icon-home-fill"></i>
+              首页</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">
+              <i class="iconfont icon-archive-fill"></i>
+              归档</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">
+              <i class="iconfont icon-category-fill"></i>
+              分类</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">
+              <i class="iconfont icon-tags-fill"></i>
+              标签</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">
+              <i class="iconfont icon-user-fill"></i>
+              关于</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/links/">
+              <i class="iconfont icon-link-fill"></i>
+              友链</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/images/chihiro.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+                <div class="mt-3 post-meta">
+                  <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+                  <time datetime="2020-11-06 11:22">
+                    2020年11月6日 上午
+                  </time>
+                </div>
+              
+
+              <div class="mt-1">
+                
+                  
+                  <span class="post-meta mr-2">
+                    <i class="iconfont icon-chart"></i>
+                    5.1k 字
+                  </span>
+                
+
+                
+                  
+                  <span class="post-meta mr-2">
+                      <i class="iconfont icon-clock-fill"></i>
+                    
+                    
+                    91
+                     分钟
+                  </span>
+                
+
+                
+              </div>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2020年11月7日 上午
+                
+              </p>
+            
+            <article class="markdown-body">
+              <h1 id="String类探究"><a href="#String类探究" class="headerlink" title="String类探究"></a>String类探究</h1><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><ul>
+<li>final类，不可变，不可继承</li>
+<li>底层基于char数组实现（final)，所以不可变</li>
+</ul>
+<h4 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h4><ul>
+<li><p>String s = new String(“aaa”)</p>
+<ol>
+<li>“aaa”会在常量池创建一个字符串，如果没有则会创建</li>
+<li>String s 会在栈区创建一个引用指针，指向后续new创建的对象</li>
+<li>new String(xxx) 此处调用字符串类型的复制方法,开辟堆内存，本质是是将常亮串的字符数组赋值给此处new的对象</li>
+<li><img src="/images/java/string-memory.png" srcset="/img/loading.gif" alt="avatar"></li>
+</ol>
+</li>
+<li><p>String.intern()</p>
+<pre><code class="hljs html">此方法返回格式化的引用，即返回常量池中的引用，没有的话则会加入常量池</code></pre>
+<h4 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h4></li>
+</ul>
+<pre><code class="hljs java">
+<span class="hljs-comment">//final类，不可继承</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">String</span></span>
+<span class="hljs-class">    <span class="hljs-keyword">implements</span> <span class="hljs-title">java</span>.<span class="hljs-title">io</span>.<span class="hljs-title">Serializable</span>, <span class="hljs-title">Comparable</span>&lt;<span class="hljs-title">String</span>&gt;, <span class="hljs-title">CharSequence</span> </span>&#123;
+   
+    <span class="hljs-comment">//核心字符数组，存储字符串中的值</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">char</span> value[];
+
+    <span class="hljs-comment">//哈希code码值</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> hash; <span class="hljs-comment">// Default to 0</span>
+
+    <span class="hljs-comment">//序列化UUID</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">long</span> serialVersionUID = -<span class="hljs-number">6849794470754667710L</span>;
+
+   
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> ObjectStreamField[] serialPersistentFields =
+        <span class="hljs-keyword">new</span> ObjectStreamField[<span class="hljs-number">0</span>];
+
+    <span class="hljs-comment">//初始化方法，将空串的数组赋值给当前对象的字符串数组</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">this</span>.value = <span class="hljs-string">""</span>.value;
+    &#125;
+
+    <span class="hljs-comment">//带参数的初始化方式，除了进行数组赋值，还进行哈希赋值</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(String original)</span> </span>&#123;
+        <span class="hljs-keyword">this</span>.value = original.value;
+        <span class="hljs-keyword">this</span>.hash = original.hash;
+    &#125;
+
+    <span class="hljs-comment">//通过字符数组初始化</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(<span class="hljs-keyword">char</span> value[])</span> </span>&#123;
+        <span class="hljs-keyword">this</span>.value = Arrays.copyOf(value, value.length);
+    &#125;
+
+    <span class="hljs-comment">//指定起始位置，和长度初始化</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(<span class="hljs-keyword">char</span> value[], <span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> count)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (offset &lt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(offset);
+        &#125;
+        <span class="hljs-keyword">if</span> (count &lt;= <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">if</span> (count &lt; <span class="hljs-number">0</span>) &#123;
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(count);
+            &#125;
+            <span class="hljs-keyword">if</span> (offset &lt;= value.length) &#123;
+                <span class="hljs-keyword">this</span>.value = <span class="hljs-string">""</span>.value;
+                <span class="hljs-keyword">return</span>;
+            &#125;
+        &#125;
+        <span class="hljs-comment">// Note: offset or count might be near -1&gt;&gt;&gt;1.</span>
+        <span class="hljs-keyword">if</span> (offset &gt; value.length - count) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(offset + count);
+        &#125;
+        <span class="hljs-keyword">this</span>.value = Arrays.copyOfRange(value, offset, offset+count);
+    &#125;
+
+    <span class="hljs-comment">//通过字符数组初始化，指定起始位置和长度</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] codePoints, <span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> count)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (offset &lt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(offset);
+        &#125;
+        <span class="hljs-keyword">if</span> (count &lt;= <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">if</span> (count &lt; <span class="hljs-number">0</span>) &#123;
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(count);
+            &#125;
+            <span class="hljs-keyword">if</span> (offset &lt;= codePoints.length) &#123;
+                <span class="hljs-keyword">this</span>.value = <span class="hljs-string">""</span>.value;
+                <span class="hljs-keyword">return</span>;
+            &#125;
+        &#125;
+        <span class="hljs-comment">// Note: offset or count might be near -1&gt;&gt;&gt;1.</span>
+        <span class="hljs-keyword">if</span> (offset &gt; codePoints.length - count) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(offset + count);
+        &#125;
+
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> end = offset + count;
+
+        <span class="hljs-comment">//确定需要创建的数组长度，加上Unicde编码校验代码点（"/u1234"）</span>
+        <span class="hljs-keyword">int</span> n = count;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = offset; i &lt; end; i++) &#123;
+            <span class="hljs-keyword">int</span> c = codePoints[i];
+            <span class="hljs-comment">//判断是否是Unicode编码代码点</span>
+            <span class="hljs-keyword">if</span> (Character.isBmpCodePoint(c))
+                <span class="hljs-keyword">continue</span>;
+            <span class="hljs-comment">//判断是否是有效数字校验点（这块也要进行加上）</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (Character.isValidCodePoint(c))
+                n++;
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IllegalArgumentException(Integer.toString(c));
+        &#125;
+
+        <span class="hljs-comment">//不可变字符数组赋值</span>
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">char</span>[] v = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[n];
+
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = offset, j = <span class="hljs-number">0</span>; i &lt; end; i++, j++) &#123;
+            <span class="hljs-keyword">int</span> c = codePoints[i];
+            <span class="hljs-keyword">if</span> (Character.isBmpCodePoint(c))
+                <span class="hljs-comment">//普通编码直接赋值</span>
+                v[j] = (<span class="hljs-keyword">char</span>)c;
+            <span class="hljs-keyword">else</span>
+                <span class="hljs-comment">//其他类型，进行转换</span>
+                Character.toSurrogates(c, v, j++);
+        &#125;
+
+        <span class="hljs-keyword">this</span>.value = v;
+    &#125;
+
+
+    <span class="hljs-comment">/* Common private utility method used to bounds check the byte array</span>
+<span class="hljs-comment">     * and requested offset &amp; length values used by the String(byte[],..)</span>
+<span class="hljs-comment">     * constructors.</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">checkBounds</span><span class="hljs-params">(<span class="hljs-keyword">byte</span>[] bytes, <span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> length)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (length &lt; <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(length);
+        <span class="hljs-keyword">if</span> (offset &lt; <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(offset);
+        <span class="hljs-keyword">if</span> (offset &gt; bytes.length - length)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(offset + length);
+    &#125;
+
+    <span class="hljs-comment">//通过byte数组进行初始化，并进行对应编码</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(<span class="hljs-keyword">byte</span> bytes[], <span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> length, String charsetName)</span></span>
+<span class="hljs-function">            <span class="hljs-keyword">throws</span> UnsupportedEncodingException </span>&#123;
+        <span class="hljs-keyword">if</span> (charsetName == <span class="hljs-keyword">null</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NullPointerException(<span class="hljs-string">"charsetName"</span>);
+        <span class="hljs-comment">//边界检查</span>
+        checkBounds(bytes, offset, length);
+        <span class="hljs-keyword">this</span>.value = StringCoding.decode(charsetName, bytes, offset, length);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(<span class="hljs-keyword">byte</span> bytes[], <span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> length, Charset charset)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (charset == <span class="hljs-keyword">null</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NullPointerException(<span class="hljs-string">"charset"</span>);
+        checkBounds(bytes, offset, length);
+        <span class="hljs-keyword">this</span>.value =  StringCoding.decode(charset, bytes, offset, length);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(<span class="hljs-keyword">byte</span> bytes[], String charsetName)</span></span>
+<span class="hljs-function">            <span class="hljs-keyword">throws</span> UnsupportedEncodingException </span>&#123;
+        <span class="hljs-keyword">this</span>(bytes, <span class="hljs-number">0</span>, bytes.length, charsetName);
+    &#125;
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(<span class="hljs-keyword">byte</span> bytes[], Charset charset)</span> </span>&#123;
+        <span class="hljs-keyword">this</span>(bytes, <span class="hljs-number">0</span>, bytes.length, charset);
+    &#125;
+    
+    <span class="hljs-comment">// 通过byte数组进行初始化</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(<span class="hljs-keyword">byte</span> bytes[], <span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> length)</span> </span>&#123;
+        checkBounds(bytes, offset, length);
+        <span class="hljs-keyword">this</span>.value = StringCoding.decode(bytes, offset, length);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(<span class="hljs-keyword">byte</span> bytes[])</span> </span>&#123;
+        <span class="hljs-keyword">this</span>(bytes, <span class="hljs-number">0</span>, bytes.length);
+    &#125;
+
+    <span class="hljs-comment">//通过StringBuffer进行初始化,此处的StringBuffer是线程安全的类</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(StringBuffer buffer)</span> </span>&#123;
+        <span class="hljs-comment">//此处锁住buffer对象，保证初始化时候其他线程无法进行修改，可能是考虑到StringBuffer线程安全</span>
+        <span class="hljs-keyword">synchronized</span>(buffer) &#123;
+            <span class="hljs-keyword">this</span>.value = Arrays.copyOf(buffer.getValue(), buffer.length());
+        &#125;
+    &#125;
+
+    <span class="hljs-comment">//通过StringBuilder进行初始化</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">String</span><span class="hljs-params">(StringBuilder builder)</span> </span>&#123;
+        <span class="hljs-keyword">this</span>.value = Arrays.copyOf(builder.getValue(), builder.length());
+    &#125;
+
+    <span class="hljs-comment">//内部初始化方法方法</span>
+    String(<span class="hljs-keyword">char</span>[] value, <span class="hljs-keyword">boolean</span> share) &#123;
+        <span class="hljs-comment">// assert share : "unshared not supported";</span>
+        <span class="hljs-keyword">this</span>.value = value;
+    &#125;
+
+    <span class="hljs-comment">//获取字符串长度，实际是内部数组长度，可包含确认编码校验点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">length</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> value.length;
+    &#125;
+
+    <span class="hljs-comment">//判断字符串是否为空，即判断内部字符数组是否为空</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">isEmpty</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> value.length == <span class="hljs-number">0</span>;
+    &#125;
+
+    <span class="hljs-comment">//获取字符串中某个位置的字符</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">char</span> <span class="hljs-title">charAt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-comment">//边界校验</span>
+        <span class="hljs-keyword">if</span> ((index &lt; <span class="hljs-number">0</span>) || (index &gt;= value.length)) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        &#125;
+        <span class="hljs-keyword">return</span> value[index];
+    &#125;
+
+    <span class="hljs-comment">//获取对应下标的ASCII码的10进制值,取出Value数组值后进行转换</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">codePointAt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> ((index &lt; <span class="hljs-number">0</span>) || (index &gt;= value.length)) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        &#125;
+        <span class="hljs-keyword">return</span> Character.codePointAtImpl(value, index, value.length);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">codePointBefore</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">int</span> i = index - <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">if</span> ((i &lt; <span class="hljs-number">0</span>) || (i &gt;= value.length)) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        &#125;
+        <span class="hljs-keyword">return</span> Character.codePointBeforeImpl(value, index, <span class="hljs-number">0</span>);
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">codePointCount</span><span class="hljs-params">(<span class="hljs-keyword">int</span> beginIndex, <span class="hljs-keyword">int</span> endIndex)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (beginIndex &lt; <span class="hljs-number">0</span> || endIndex &gt; value.length || beginIndex &gt; endIndex) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IndexOutOfBoundsException();
+        &#125;
+        <span class="hljs-keyword">return</span> Character.codePointCountImpl(value, beginIndex, endIndex - beginIndex);
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">offsetByCodePoints</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index, <span class="hljs-keyword">int</span> codePointOffset)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (index &lt; <span class="hljs-number">0</span> || index &gt; value.length) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IndexOutOfBoundsException();
+        &#125;
+        <span class="hljs-keyword">return</span> Character.offsetByCodePointsImpl(value, <span class="hljs-number">0</span>, value.length,
+                index, codePointOffset);
+    &#125;
+
+   <span class="hljs-comment">//字符串拷贝</span>
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">getChars</span><span class="hljs-params">(<span class="hljs-keyword">char</span> dst[], <span class="hljs-keyword">int</span> dstBegin)</span> </span>&#123;
+        System.arraycopy(value, <span class="hljs-number">0</span>, dst, dstBegin, value.length);
+    &#125;
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">getChars</span><span class="hljs-params">(<span class="hljs-keyword">int</span> srcBegin, <span class="hljs-keyword">int</span> srcEnd, <span class="hljs-keyword">char</span> dst[], <span class="hljs-keyword">int</span> dstBegin)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (srcBegin &lt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(srcBegin);
+        &#125;
+        <span class="hljs-keyword">if</span> (srcEnd &gt; value.length) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(srcEnd);
+        &#125;
+        <span class="hljs-keyword">if</span> (srcBegin &gt; srcEnd) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(srcEnd - srcBegin);
+        &#125;
+        System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
+    &#125;
+
+    <span class="hljs-comment">//根据编码规则获取byte</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] getBytes(String charsetName)
+            <span class="hljs-keyword">throws</span> UnsupportedEncodingException &#123;
+        <span class="hljs-keyword">if</span> (charsetName == <span class="hljs-keyword">null</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NullPointerException();
+        <span class="hljs-keyword">return</span> StringCoding.encode(charsetName, value, <span class="hljs-number">0</span>, value.length);
+    &#125;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] getBytes(Charset charset) &#123;
+        <span class="hljs-keyword">if</span> (charset == <span class="hljs-keyword">null</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NullPointerException();
+        <span class="hljs-keyword">return</span> StringCoding.encode(charset, value, <span class="hljs-number">0</span>, value.length);
+    &#125;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">byte</span>[] getBytes() &#123;
+        <span class="hljs-keyword">return</span> StringCoding.encode(value, <span class="hljs-number">0</span>, value.length);
+    &#125;
+
+    <span class="hljs-comment">//比较相等，逐步比较两个字符串的字符数组</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">equals</span><span class="hljs-params">(Object anObject)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span> == anObject) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+        &#125;
+        <span class="hljs-keyword">if</span> (anObject <span class="hljs-keyword">instanceof</span> String) &#123;
+            String anotherString = (String)anObject;
+            <span class="hljs-keyword">int</span> n = value.length;
+            <span class="hljs-keyword">if</span> (n == anotherString.value.length) &#123;
+                <span class="hljs-keyword">char</span> v1[] = value;
+                <span class="hljs-keyword">char</span> v2[] = anotherString.value;
+                <span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>;
+                <span class="hljs-keyword">while</span> (n-- != <span class="hljs-number">0</span>) &#123;
+                    <span class="hljs-keyword">if</span> (v1[i] != v2[i])
+                        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+                    i++;
+                &#125;
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">contentEquals</span><span class="hljs-params">(StringBuffer sb)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> contentEquals((CharSequence)sb);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">nonSyncContentEquals</span><span class="hljs-params">(AbstractStringBuilder sb)</span> </span>&#123;
+        <span class="hljs-keyword">char</span> v1[] = value;
+        <span class="hljs-keyword">char</span> v2[] = sb.getValue();
+        <span class="hljs-keyword">int</span> n = v1.length;
+        <span class="hljs-keyword">if</span> (n != sb.length()) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        &#125;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;
+            <span class="hljs-keyword">if</span> (v1[i] != v2[i]) &#123;
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125;
+
+    <span class="hljs-comment">//和CharSequence 比较是否相等</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">contentEquals</span><span class="hljs-params">(CharSequence cs)</span> </span>&#123;
+        <span class="hljs-comment">// Argument is a StringBuffer, StringBuilder</span>
+        <span class="hljs-keyword">if</span> (cs <span class="hljs-keyword">instanceof</span> AbstractStringBuilder) &#123;
+            <span class="hljs-keyword">if</span> (cs <span class="hljs-keyword">instanceof</span> StringBuffer) &#123;
+                <span class="hljs-keyword">synchronized</span>(cs) &#123;
+                   <span class="hljs-keyword">return</span> nonSyncContentEquals((AbstractStringBuilder)cs);
+                &#125;
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                <span class="hljs-keyword">return</span> nonSyncContentEquals((AbstractStringBuilder)cs);
+            &#125;
+        &#125;
+        <span class="hljs-comment">// 字符串类型则直接比较</span>
+        <span class="hljs-keyword">if</span> (cs <span class="hljs-keyword">instanceof</span> String) &#123;
+            <span class="hljs-keyword">return</span> equals(cs);
+        &#125;
+        <span class="hljs-comment">// 其余情况逐步比较</span>
+        <span class="hljs-keyword">char</span> v1[] = value;
+        <span class="hljs-keyword">int</span> n = v1.length;
+        <span class="hljs-keyword">if</span> (n != cs.length()) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        &#125;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;
+            <span class="hljs-keyword">if</span> (v1[i] != cs.charAt(i)) &#123;
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125;
+
+    <span class="hljs-comment">//忽略大小写方式比较大小</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">equalsIgnoreCase</span><span class="hljs-params">(String anotherString)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">this</span> == anotherString) ? <span class="hljs-keyword">true</span>
+                : (anotherString != <span class="hljs-keyword">null</span>)
+                &amp;&amp; (anotherString.value.length == value.length)
+                &amp;&amp; regionMatches(<span class="hljs-keyword">true</span>, <span class="hljs-number">0</span>, anotherString, <span class="hljs-number">0</span>, value.length);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">compareTo</span><span class="hljs-params">(String anotherString)</span> </span>&#123;
+        <span class="hljs-keyword">int</span> len1 = value.length;
+        <span class="hljs-keyword">int</span> len2 = anotherString.value.length;
+        <span class="hljs-keyword">int</span> lim = Math.min(len1, len2);
+        <span class="hljs-keyword">char</span> v1[] = value;
+        <span class="hljs-keyword">char</span> v2[] = anotherString.value;
+
+        <span class="hljs-keyword">int</span> k = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">while</span> (k &lt; lim) &#123;
+            <span class="hljs-keyword">char</span> c1 = v1[k];
+            <span class="hljs-keyword">char</span> c2 = v2[k];
+            <span class="hljs-keyword">if</span> (c1 != c2) &#123;
+                <span class="hljs-keyword">return</span> c1 - c2;
+            &#125;
+            k++;
+        &#125;
+        <span class="hljs-keyword">return</span> len1 - len2;
+    &#125;
+    
+    <span class="hljs-comment">//比较大小</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Comparator&lt;String&gt; CASE_INSENSITIVE_ORDER
+                                         = <span class="hljs-keyword">new</span> CaseInsensitiveComparator();
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CaseInsensitiveComparator</span></span>
+<span class="hljs-class">            <span class="hljs-keyword">implements</span> <span class="hljs-title">Comparator</span>&lt;<span class="hljs-title">String</span>&gt;, <span class="hljs-title">java</span>.<span class="hljs-title">io</span>.<span class="hljs-title">Serializable</span> </span>&#123;
+        <span class="hljs-comment">// use serialVersionUID from JDK 1.2.2 for interoperability</span>
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">long</span> serialVersionUID = <span class="hljs-number">8575799808933029326L</span>;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">compare</span><span class="hljs-params">(String s1, String s2)</span> </span>&#123;
+            <span class="hljs-keyword">int</span> n1 = s1.length();
+            <span class="hljs-keyword">int</span> n2 = s2.length();
+            <span class="hljs-keyword">int</span> min = Math.min(n1, n2);
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; min; i++) &#123;
+                <span class="hljs-keyword">char</span> c1 = s1.charAt(i);
+                <span class="hljs-keyword">char</span> c2 = s2.charAt(i);
+                <span class="hljs-keyword">if</span> (c1 != c2) &#123;
+                    c1 = Character.toUpperCase(c1);
+                    c2 = Character.toUpperCase(c2);
+                    <span class="hljs-keyword">if</span> (c1 != c2) &#123;
+                        c1 = Character.toLowerCase(c1);
+                        c2 = Character.toLowerCase(c2);
+                        <span class="hljs-keyword">if</span> (c1 != c2) &#123;
+                            <span class="hljs-comment">// No overflow because of numeric promotion</span>
+                            <span class="hljs-keyword">return</span> c1 - c2;
+                        &#125;
+                    &#125;
+                &#125;
+            &#125;
+            <span class="hljs-keyword">return</span> n1 - n2;
+        &#125;
+
+        <span class="hljs-comment">/** Replaces the de-serialized object. */</span>
+        <span class="hljs-function"><span class="hljs-keyword">private</span> Object <span class="hljs-title">readResolve</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> CASE_INSENSITIVE_ORDER; &#125;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">compareToIgnoreCase</span><span class="hljs-params">(String str)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> CASE_INSENSITIVE_ORDER.compare(<span class="hljs-keyword">this</span>, str);
+    &#125;
+
+    <span class="hljs-comment">//比较指定部分是否相等</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">regionMatches</span><span class="hljs-params">(<span class="hljs-keyword">int</span> toffset, String other, <span class="hljs-keyword">int</span> ooffset,</span></span>
+<span class="hljs-function"><span class="hljs-params">            <span class="hljs-keyword">int</span> len)</span> </span>&#123;
+        <span class="hljs-keyword">char</span> ta[] = value;
+        <span class="hljs-keyword">int</span> to = toffset;
+        <span class="hljs-keyword">char</span> pa[] = other.value;
+        <span class="hljs-keyword">int</span> po = ooffset;
+        <span class="hljs-comment">// Note: toffset, ooffset, or len might be near -1&gt;&gt;&gt;1.</span>
+        <span class="hljs-keyword">if</span> ((ooffset &lt; <span class="hljs-number">0</span>) || (toffset &lt; <span class="hljs-number">0</span>)
+                || (toffset &gt; (<span class="hljs-keyword">long</span>)value.length - len)
+                || (ooffset &gt; (<span class="hljs-keyword">long</span>)other.value.length - len)) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        &#125;
+        <span class="hljs-keyword">while</span> (len-- &gt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">if</span> (ta[to++] != pa[po++]) &#123;
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">regionMatches</span><span class="hljs-params">(<span class="hljs-keyword">boolean</span> ignoreCase, <span class="hljs-keyword">int</span> toffset,</span></span>
+<span class="hljs-function"><span class="hljs-params">            String other, <span class="hljs-keyword">int</span> ooffset, <span class="hljs-keyword">int</span> len)</span> </span>&#123;
+        <span class="hljs-keyword">char</span> ta[] = value;
+        <span class="hljs-keyword">int</span> to = toffset;
+        <span class="hljs-keyword">char</span> pa[] = other.value;
+        <span class="hljs-keyword">int</span> po = ooffset;
+        <span class="hljs-comment">// Note: toffset, ooffset, or len might be near -1&gt;&gt;&gt;1.</span>
+        <span class="hljs-keyword">if</span> ((ooffset &lt; <span class="hljs-number">0</span>) || (toffset &lt; <span class="hljs-number">0</span>)
+                || (toffset &gt; (<span class="hljs-keyword">long</span>)value.length - len)
+                || (ooffset &gt; (<span class="hljs-keyword">long</span>)other.value.length - len)) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        &#125;
+        <span class="hljs-keyword">while</span> (len-- &gt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">char</span> c1 = ta[to++];
+            <span class="hljs-keyword">char</span> c2 = pa[po++];
+            <span class="hljs-keyword">if</span> (c1 == c2) &#123;
+                <span class="hljs-keyword">continue</span>;
+            &#125;
+            <span class="hljs-keyword">if</span> (ignoreCase) &#123;
+                <span class="hljs-comment">// If characters don't match but case may be ignored,</span>
+                <span class="hljs-comment">// try converting both characters to uppercase.</span>
+                <span class="hljs-comment">// If the results match, then the comparison scan should</span>
+                <span class="hljs-comment">// continue.</span>
+                <span class="hljs-keyword">char</span> u1 = Character.toUpperCase(c1);
+                <span class="hljs-keyword">char</span> u2 = Character.toUpperCase(c2);
+                <span class="hljs-keyword">if</span> (u1 == u2) &#123;
+                    <span class="hljs-keyword">continue</span>;
+                &#125;
+                <span class="hljs-comment">// Unfortunately, conversion to uppercase does not work properly</span>
+                <span class="hljs-comment">// for the Georgian alphabet, which has strange rules about case</span>
+                <span class="hljs-comment">// conversion.  So we need to make one last check before</span>
+                <span class="hljs-comment">// exiting.</span>
+                <span class="hljs-keyword">if</span> (Character.toLowerCase(u1) == Character.toLowerCase(u2)) &#123;
+                    <span class="hljs-keyword">continue</span>;
+                &#125;
+            &#125;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125;
+
+    <span class="hljs-comment">//比较制定开始部分 是否以prefix开始</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">startsWith</span><span class="hljs-params">(String prefix, <span class="hljs-keyword">int</span> toffset)</span> </span>&#123;
+        <span class="hljs-keyword">char</span> ta[] = value;
+        <span class="hljs-keyword">int</span> to = toffset;
+        <span class="hljs-keyword">char</span> pa[] = prefix.value;
+        <span class="hljs-keyword">int</span> po = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">int</span> pc = prefix.value.length;
+        <span class="hljs-comment">// Note: toffset might be near -1&gt;&gt;&gt;1.</span>
+        <span class="hljs-keyword">if</span> ((toffset &lt; <span class="hljs-number">0</span>) || (toffset &gt; value.length - pc)) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        &#125;
+        <span class="hljs-keyword">while</span> (--pc &gt;= <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">if</span> (ta[to++] != pa[po++]) &#123;
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125;
+
+    <span class="hljs-comment">//比较从0开始 是否以prefix开始</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">startsWith</span><span class="hljs-params">(String prefix)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> startsWith(prefix, <span class="hljs-number">0</span>);
+    &#125;
+    
+    <span class="hljs-comment">//比较是否以 给定后缀结尾</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">endsWith</span><span class="hljs-params">(String suffix)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> startsWith(suffix, value.length - suffix.value.length);
+    &#125;
+
+    <span class="hljs-comment">//获取hashCode值，如果是字符串方式，则不会进行计算，其他方式初始化则会进行计算</span>
+    <span class="hljs-comment">//s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">hashCode</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">int</span> h = hash;
+        <span class="hljs-keyword">if</span> (h == <span class="hljs-number">0</span> &amp;&amp; value.length &gt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">char</span> val[] = value;
+
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; value.length; i++) &#123;
+                h = <span class="hljs-number">31</span> * h + val[i];
+            &#125;
+            hash = h;
+        &#125;
+        <span class="hljs-keyword">return</span> h;
+    &#125;
+
+  
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(<span class="hljs-keyword">int</span> ch)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> indexOf(ch, <span class="hljs-number">0</span>);
+    &#125;
+
+    <span class="hljs-comment">//从指定下标开始 判断给定字符的位置</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(<span class="hljs-keyword">int</span> ch, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> max = value.length;
+        <span class="hljs-keyword">if</span> (fromIndex &lt; <span class="hljs-number">0</span>) &#123;
+            fromIndex = <span class="hljs-number">0</span>;
+        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (fromIndex &gt;= max) &#123;
+            <span class="hljs-comment">// Note: fromIndex might be near -1&gt;&gt;&gt;1.</span>
+            <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
+        &#125;
+
+        <span class="hljs-keyword">if</span> (ch &lt; Character.MIN_SUPPLEMENTARY_CODE_POINT) &#123;
+            <span class="hljs-comment">// handle most cases here (ch is a BMP code point or a</span>
+            <span class="hljs-comment">// negative value (invalid code point))</span>
+            <span class="hljs-keyword">final</span> <span class="hljs-keyword">char</span>[] value = <span class="hljs-keyword">this</span>.value;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = fromIndex; i &lt; max; i++) &#123;
+                <span class="hljs-keyword">if</span> (value[i] == ch) &#123;
+                    <span class="hljs-keyword">return</span> i;
+                &#125;
+            &#125;
+            <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-keyword">return</span> indexOfSupplementary(ch, fromIndex);
+        &#125;
+    &#125;
+
+    <span class="hljs-comment">//处理补充字符的位置</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOfSupplementary</span><span class="hljs-params">(<span class="hljs-keyword">int</span> ch, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (Character.isValidCodePoint(ch)) &#123;
+            <span class="hljs-keyword">final</span> <span class="hljs-keyword">char</span>[] value = <span class="hljs-keyword">this</span>.value;
+            <span class="hljs-keyword">final</span> <span class="hljs-keyword">char</span> hi = Character.highSurrogate(ch);
+            <span class="hljs-keyword">final</span> <span class="hljs-keyword">char</span> lo = Character.lowSurrogate(ch);
+            <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> max = value.length - <span class="hljs-number">1</span>;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = fromIndex; i &lt; max; i++) &#123;
+                <span class="hljs-keyword">if</span> (value[i] == hi &amp;&amp; value[i + <span class="hljs-number">1</span>] == lo) &#123;
+                    <span class="hljs-keyword">return</span> i;
+                &#125;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
+    &#125;
+
+    <span class="hljs-comment">//字符最后的出现的位置</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(<span class="hljs-keyword">int</span> ch)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> lastIndexOf(ch, value.length - <span class="hljs-number">1</span>);
+    &#125;
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(<span class="hljs-keyword">int</span> ch, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (ch &lt; Character.MIN_SUPPLEMENTARY_CODE_POINT) &#123;
+            <span class="hljs-comment">// handle most cases here (ch is a BMP code point or a</span>
+            <span class="hljs-comment">// negative value (invalid code point))</span>
+            <span class="hljs-keyword">final</span> <span class="hljs-keyword">char</span>[] value = <span class="hljs-keyword">this</span>.value;
+            <span class="hljs-keyword">int</span> i = Math.min(fromIndex, value.length - <span class="hljs-number">1</span>);
+            <span class="hljs-keyword">for</span> (; i &gt;= <span class="hljs-number">0</span>; i--) &#123;
+                <span class="hljs-keyword">if</span> (value[i] == ch) &#123;
+                    <span class="hljs-keyword">return</span> i;
+                &#125;
+            &#125;
+            <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-keyword">return</span> lastIndexOfSupplementary(ch, fromIndex);
+        &#125;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOfSupplementary</span><span class="hljs-params">(<span class="hljs-keyword">int</span> ch, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (Character.isValidCodePoint(ch)) &#123;
+            <span class="hljs-keyword">final</span> <span class="hljs-keyword">char</span>[] value = <span class="hljs-keyword">this</span>.value;
+            <span class="hljs-keyword">char</span> hi = Character.highSurrogate(ch);
+            <span class="hljs-keyword">char</span> lo = Character.lowSurrogate(ch);
+            <span class="hljs-keyword">int</span> i = Math.min(fromIndex, value.length - <span class="hljs-number">2</span>);
+            <span class="hljs-keyword">for</span> (; i &gt;= <span class="hljs-number">0</span>; i--) &#123;
+                <span class="hljs-keyword">if</span> (value[i] == hi &amp;&amp; value[i + <span class="hljs-number">1</span>] == lo) &#123;
+                    <span class="hljs-keyword">return</span> i;
+                &#125;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
+    &#125;
+
+    <span class="hljs-comment">//判断字符串的起始位置</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(String str)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> indexOf(str, <span class="hljs-number">0</span>);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(String str, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> indexOf(value, <span class="hljs-number">0</span>, value.length,
+                str.value, <span class="hljs-number">0</span>, str.value.length, fromIndex);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(<span class="hljs-keyword">char</span>[] source, <span class="hljs-keyword">int</span> sourceOffset, <span class="hljs-keyword">int</span> sourceCount,</span></span>
+<span class="hljs-function"><span class="hljs-params">            String target, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> indexOf(source, sourceOffset, sourceCount,
+                       target.value, <span class="hljs-number">0</span>, target.value.length,
+                       fromIndex);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(<span class="hljs-keyword">char</span>[] source, <span class="hljs-keyword">int</span> sourceOffset, <span class="hljs-keyword">int</span> sourceCount,</span></span>
+<span class="hljs-function"><span class="hljs-params">            <span class="hljs-keyword">char</span>[] target, <span class="hljs-keyword">int</span> targetOffset, <span class="hljs-keyword">int</span> targetCount,</span></span>
+<span class="hljs-function"><span class="hljs-params">            <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (fromIndex &gt;= sourceCount) &#123;
+            <span class="hljs-keyword">return</span> (targetCount == <span class="hljs-number">0</span> ? sourceCount : -<span class="hljs-number">1</span>);
+        &#125;
+        <span class="hljs-keyword">if</span> (fromIndex &lt; <span class="hljs-number">0</span>) &#123;
+            fromIndex = <span class="hljs-number">0</span>;
+        &#125;
+        <span class="hljs-keyword">if</span> (targetCount == <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">return</span> fromIndex;
+        &#125;
+
+        <span class="hljs-keyword">char</span> first = target[targetOffset];
+        <span class="hljs-keyword">int</span> max = sourceOffset + (sourceCount - targetCount);
+
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = sourceOffset + fromIndex; i &lt;= max; i++) &#123;
+            <span class="hljs-comment">/* Look for first character. */</span>
+            <span class="hljs-keyword">if</span> (source[i] != first) &#123;
+                <span class="hljs-keyword">while</span> (++i &lt;= max &amp;&amp; source[i] != first);
+            &#125;
+
+            <span class="hljs-comment">/* Found first character, now look at the rest of v2 */</span>
+            <span class="hljs-keyword">if</span> (i &lt;= max) &#123;
+                <span class="hljs-keyword">int</span> j = i + <span class="hljs-number">1</span>;
+                <span class="hljs-keyword">int</span> end = j + targetCount - <span class="hljs-number">1</span>;
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> k = targetOffset + <span class="hljs-number">1</span>; j &lt; end &amp;&amp; source[j]
+                        == target[k]; j++, k++);
+
+                <span class="hljs-keyword">if</span> (j == end) &#123;
+                    <span class="hljs-comment">/* Found whole string. */</span>
+                    <span class="hljs-keyword">return</span> i - sourceOffset;
+                &#125;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(String str)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> lastIndexOf(str, value.length);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(String str, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> lastIndexOf(value, <span class="hljs-number">0</span>, value.length,
+                str.value, <span class="hljs-number">0</span>, str.value.length, fromIndex);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(<span class="hljs-keyword">char</span>[] source, <span class="hljs-keyword">int</span> sourceOffset, <span class="hljs-keyword">int</span> sourceCount,</span></span>
+<span class="hljs-function"><span class="hljs-params">            String target, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> lastIndexOf(source, sourceOffset, sourceCount,
+                       target.value, <span class="hljs-number">0</span>, target.value.length,
+                       fromIndex);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(<span class="hljs-keyword">char</span>[] source, <span class="hljs-keyword">int</span> sourceOffset, <span class="hljs-keyword">int</span> sourceCount,</span></span>
+<span class="hljs-function"><span class="hljs-params">            <span class="hljs-keyword">char</span>[] target, <span class="hljs-keyword">int</span> targetOffset, <span class="hljs-keyword">int</span> targetCount,</span></span>
+<span class="hljs-function"><span class="hljs-params">            <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-comment">/*</span>
+<span class="hljs-comment">         * Check arguments; return immediately where possible. For</span>
+<span class="hljs-comment">         * consistency, don't check for null str.</span>
+<span class="hljs-comment">         */</span>
+        <span class="hljs-keyword">int</span> rightIndex = sourceCount - targetCount;
+        <span class="hljs-keyword">if</span> (fromIndex &lt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
+        &#125;
+        <span class="hljs-keyword">if</span> (fromIndex &gt; rightIndex) &#123;
+            fromIndex = rightIndex;
+        &#125;
+        <span class="hljs-comment">/* Empty string always matches. */</span>
+        <span class="hljs-keyword">if</span> (targetCount == <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">return</span> fromIndex;
+        &#125;
+
+        <span class="hljs-keyword">int</span> strLastIndex = targetOffset + targetCount - <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">char</span> strLastChar = target[strLastIndex];
+        <span class="hljs-keyword">int</span> min = sourceOffset + targetCount - <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">int</span> i = min + fromIndex;
+
+    startSearchForLastChar:
+        <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;
+            <span class="hljs-keyword">while</span> (i &gt;= min &amp;&amp; source[i] != strLastChar) &#123;
+                i--;
+            &#125;
+            <span class="hljs-keyword">if</span> (i &lt; min) &#123;
+                <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
+            &#125;
+            <span class="hljs-keyword">int</span> j = i - <span class="hljs-number">1</span>;
+            <span class="hljs-keyword">int</span> start = j - (targetCount - <span class="hljs-number">1</span>);
+            <span class="hljs-keyword">int</span> k = strLastIndex - <span class="hljs-number">1</span>;
+
+            <span class="hljs-keyword">while</span> (j &gt; start) &#123;
+                <span class="hljs-keyword">if</span> (source[j--] != target[k--]) &#123;
+                    i--;
+                    <span class="hljs-keyword">continue</span> startSearchForLastChar;
+                &#125;
+            &#125;
+            <span class="hljs-keyword">return</span> start - sourceOffset + <span class="hljs-number">1</span>;
+        &#125;
+    &#125;
+
+    <span class="hljs-comment">//字符串分割</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">substring</span><span class="hljs-params">(<span class="hljs-keyword">int</span> beginIndex)</span> </span>&#123;
+        <span class="hljs-comment">//边界值判断</span>
+        <span class="hljs-keyword">if</span> (beginIndex &lt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(beginIndex);
+        &#125;
+        <span class="hljs-keyword">int</span> subLen = value.length - beginIndex;
+        <span class="hljs-keyword">if</span> (subLen &lt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(subLen);
+        &#125;
+        <span class="hljs-comment">//字符串截取</span>
+        <span class="hljs-keyword">return</span> (beginIndex == <span class="hljs-number">0</span>) ? <span class="hljs-keyword">this</span> : <span class="hljs-keyword">new</span> String(value, beginIndex, subLen);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">substring</span><span class="hljs-params">(<span class="hljs-keyword">int</span> beginIndex, <span class="hljs-keyword">int</span> endIndex)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (beginIndex &lt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(beginIndex);
+        &#125;
+        <span class="hljs-keyword">if</span> (endIndex &gt; value.length) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(endIndex);
+        &#125;
+        <span class="hljs-keyword">int</span> subLen = endIndex - beginIndex;
+        <span class="hljs-keyword">if</span> (subLen &lt; <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(subLen);
+        &#125;
+        <span class="hljs-keyword">return</span> ((beginIndex == <span class="hljs-number">0</span>) &amp;&amp; (endIndex == value.length)) ? <span class="hljs-keyword">this</span>
+                : <span class="hljs-keyword">new</span> String(value, beginIndex, subLen);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> CharSequence <span class="hljs-title">subSequence</span><span class="hljs-params">(<span class="hljs-keyword">int</span> beginIndex, <span class="hljs-keyword">int</span> endIndex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.substring(beginIndex, endIndex);
+    &#125;
+
+    <span class="hljs-comment">//字符串拼接</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">concat</span><span class="hljs-params">(String str)</span> </span>&#123;
+        <span class="hljs-keyword">int</span> otherLen = str.length();
+        <span class="hljs-keyword">if</span> (otherLen == <span class="hljs-number">0</span>) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+        &#125;
+        <span class="hljs-keyword">int</span> len = value.length;
+        <span class="hljs-comment">//创建新的字符数组，并开辟为存储后续数组的空间</span>
+        <span class="hljs-keyword">char</span> buf[] = Arrays.copyOf(value, len + otherLen);
+        <span class="hljs-comment">//str的字符数组放入buf</span>
+        str.getChars(buf, len);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(buf, <span class="hljs-keyword">true</span>);
+    &#125;
+    
+    <span class="hljs-comment">//替换其中某个字符</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">replace</span><span class="hljs-params">(<span class="hljs-keyword">char</span> oldChar, <span class="hljs-keyword">char</span> newChar)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (oldChar != newChar) &#123;
+            <span class="hljs-keyword">int</span> len = value.length;
+            <span class="hljs-keyword">int</span> i = -<span class="hljs-number">1</span>;
+            <span class="hljs-keyword">char</span>[] val = value; <span class="hljs-comment">/* avoid getfield opcode */</span>
+            
+            <span class="hljs-comment">//找到旧字符位置</span>
+            <span class="hljs-keyword">while</span> (++i &lt; len) &#123;
+                <span class="hljs-keyword">if</span> (val[i] == oldChar) &#123;
+                    <span class="hljs-keyword">break</span>;
+                &#125;
+            &#125;
+            <span class="hljs-keyword">if</span> (i &lt; len) &#123;
+                <span class="hljs-comment">//创建新的字符数组并赋值</span>
+                <span class="hljs-keyword">char</span> buf[] = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[len];
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> j = <span class="hljs-number">0</span>; j &lt; i; j++) &#123;
+                    buf[j] = val[j];
+                &#125;
+                <span class="hljs-comment">//从字符开始进行替换，此处是全部替换</span>
+                <span class="hljs-keyword">while</span> (i &lt; len) &#123;
+                    <span class="hljs-keyword">char</span> c = val[i];
+                    buf[i] = (c == oldChar) ? newChar : c;
+                    i++;
+                &#125;
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(buf, <span class="hljs-keyword">true</span>);
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">//判断字符串与表达式是否匹配</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">matches</span><span class="hljs-params">(String regex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> Pattern.matches(regex, <span class="hljs-keyword">this</span>);
+    &#125;
+
+    <span class="hljs-comment">//判断是否包含,本质是调用indexOf方法</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">contains</span><span class="hljs-params">(CharSequence s)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> indexOf(s.toString()) &gt; -<span class="hljs-number">1</span>;
+    &#125;
+
+    <span class="hljs-comment">//根据正则式匹配并替换，首次替换</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">replaceFirst</span><span class="hljs-params">(String regex, String replacement)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> Pattern.compile(regex).matcher(<span class="hljs-keyword">this</span>).replaceFirst(replacement);
+    &#125;
+
+    <span class="hljs-comment">//根据正则式匹配,并全部替换</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">replaceAll</span><span class="hljs-params">(String regex, String replacement)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> Pattern.compile(regex).matcher(<span class="hljs-keyword">this</span>).replaceAll(replacement);
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">replace</span><span class="hljs-params">(CharSequence target, CharSequence replacement)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> Pattern.compile(target.toString(), Pattern.LITERAL).matcher(
+                <span class="hljs-keyword">this</span>).replaceAll(Matcher.quoteReplacement(replacement.toString()));
+    &#125;
+
+    <span class="hljs-comment">//字符串拆分</span>
+    <span class="hljs-keyword">public</span> String[] split(String regex, <span class="hljs-keyword">int</span> limit) &#123;
+        <span class="hljs-comment">/* fastpath if the regex is a</span>
+<span class="hljs-comment">         (1)one-char String and this character is not one of the</span>
+<span class="hljs-comment">            RegEx's meta characters ".$|()[&#123;^?*+\\", or</span>
+<span class="hljs-comment">         (2)two-char String and the first char is the backslash and</span>
+<span class="hljs-comment">            the second is not the ascii digit or ascii letter.</span>
+<span class="hljs-comment">         */</span>
+        <span class="hljs-keyword">char</span> ch = <span class="hljs-number">0</span>;
+        <span class="hljs-comment">//正则式匹配</span>
+        <span class="hljs-keyword">if</span> (((regex.value.length == <span class="hljs-number">1</span> &amp;&amp;
+             <span class="hljs-string">".$|()[&#123;^?*+\\"</span>.indexOf(ch = regex.charAt(<span class="hljs-number">0</span>)) == -<span class="hljs-number">1</span>) ||
+             (regex.length() == <span class="hljs-number">2</span> &amp;&amp;
+              regex.charAt(<span class="hljs-number">0</span>) == <span class="hljs-string">'\\'</span> &amp;&amp;
+              (((ch = regex.charAt(<span class="hljs-number">1</span>))-<span class="hljs-string">'0'</span>)|(<span class="hljs-string">'9'</span>-ch)) &lt; <span class="hljs-number">0</span> &amp;&amp;
+              ((ch-<span class="hljs-string">'a'</span>)|(<span class="hljs-string">'z'</span>-ch)) &lt; <span class="hljs-number">0</span> &amp;&amp;
+              ((ch-<span class="hljs-string">'A'</span>)|(<span class="hljs-string">'Z'</span>-ch)) &lt; <span class="hljs-number">0</span>)) &amp;&amp;
+            (ch &lt; Character.MIN_HIGH_SURROGATE ||
+             ch &gt; Character.MAX_LOW_SURROGATE))
+        &#123;
+            <span class="hljs-keyword">int</span> off = <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">int</span> next = <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">boolean</span> limited = limit &gt; <span class="hljs-number">0</span>;
+            ArrayList&lt;String&gt; list = <span class="hljs-keyword">new</span> ArrayList&lt;&gt;();
+            <span class="hljs-comment">//进行字符串拆分</span>
+            <span class="hljs-keyword">while</span> ((next = indexOf(ch, off)) != -<span class="hljs-number">1</span>) &#123;
+                <span class="hljs-keyword">if</span> (!limited || list.size() &lt; limit - <span class="hljs-number">1</span>) &#123;
+                    <span class="hljs-comment">//未到限制份数,继续进行拆分</span>
+                    list.add(substring(off, next));
+                    off = next + <span class="hljs-number">1</span>;
+                &#125; <span class="hljs-keyword">else</span> &#123;    <span class="hljs-comment">// last one</span>
+                    <span class="hljs-comment">//assert (list.size() == limit - 1);</span>
+                    <span class="hljs-comment">//到限制次数，此时为最后一个串</span>
+                    list.add(substring(off, value.length));
+                    off = value.length;
+                    <span class="hljs-keyword">break</span>;
+                &#125;
+            &#125;
+            <span class="hljs-comment">//未匹配到正则式，不进行拆分</span>
+            <span class="hljs-keyword">if</span> (off == <span class="hljs-number">0</span>)
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String[]&#123;<span class="hljs-keyword">this</span>&#125;;
+
+            <span class="hljs-comment">//未限制，此处增加最后一个串</span>
+            <span class="hljs-keyword">if</span> (!limited || list.size() &lt; limit)
+                list.add(substring(off, value.length));
+
+            <span class="hljs-comment">// Construct result</span>
+            <span class="hljs-keyword">int</span> resultSize = list.size();
+            <span class="hljs-keyword">if</span> (limit == <span class="hljs-number">0</span>) &#123;
+                <span class="hljs-comment">//获取字符串数组长度</span>
+                <span class="hljs-keyword">while</span> (resultSize &gt; <span class="hljs-number">0</span> &amp;&amp; list.get(resultSize - <span class="hljs-number">1</span>).length() == <span class="hljs-number">0</span>) &#123;
+                    resultSize--;
+                &#125;
+            &#125;
+            String[] result = <span class="hljs-keyword">new</span> String[resultSize];
+            <span class="hljs-keyword">return</span> list.subList(<span class="hljs-number">0</span>, resultSize).toArray(result);
+        &#125;
+        <span class="hljs-comment">//表达式长度为多个，或者特殊字符，走Pattern方法</span>
+        <span class="hljs-keyword">return</span> Pattern.compile(regex).split(<span class="hljs-keyword">this</span>, limit);
+    &#125;
+
+    <span class="hljs-comment">//根据正则式进行拆分，本质调用上一个方法，不进行分割串限制</span>
+    <span class="hljs-keyword">public</span> String[] split(String regex) &#123;
+        <span class="hljs-keyword">return</span> split(regex, <span class="hljs-number">0</span>);
+    &#125;
+
+    <span class="hljs-comment">//多个字符数组根据表达式合并</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">join</span><span class="hljs-params">(CharSequence delimiter, CharSequence... elements)</span> </span>&#123;
+        Objects.requireNonNull(delimiter);
+        Objects.requireNonNull(elements);
+        <span class="hljs-comment">// Number of elements not likely worth Arrays.stream overhead.</span>
+        StringJoiner joiner = <span class="hljs-keyword">new</span> StringJoiner(delimiter);
+        <span class="hljs-keyword">for</span> (CharSequence cs: elements) &#123;
+            joiner.add(cs);
+        &#125;
+        <span class="hljs-keyword">return</span> joiner.toString();
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">join</span><span class="hljs-params">(CharSequence delimiter,</span></span>
+<span class="hljs-function"><span class="hljs-params">            Iterable&lt;? extends CharSequence&gt; elements)</span> </span>&#123;
+        Objects.requireNonNull(delimiter);
+        Objects.requireNonNull(elements);
+        StringJoiner joiner = <span class="hljs-keyword">new</span> StringJoiner(delimiter);
+        <span class="hljs-keyword">for</span> (CharSequence cs: elements) &#123;
+            joiner.add(cs);
+        &#125;
+        <span class="hljs-keyword">return</span> joiner.toString();
+    &#125;
+
+    <span class="hljs-comment">//转换为小写</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">toLowerCase</span><span class="hljs-params">(Locale locale)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (locale == <span class="hljs-keyword">null</span>) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NullPointerException();
+        &#125;
+
+        <span class="hljs-keyword">int</span> firstUpper;
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> len = value.length;
+
+        <span class="hljs-comment">/* Now check if there are any characters that need to be changed. */</span>
+        scan: &#123;
+            <span class="hljs-keyword">for</span> (firstUpper = <span class="hljs-number">0</span> ; firstUpper &lt; len; ) &#123;
+                <span class="hljs-keyword">char</span> c = value[firstUpper];
+                <span class="hljs-keyword">if</span> ((c &gt;= Character.MIN_HIGH_SURROGATE)
+                        &amp;&amp; (c &lt;= Character.MAX_HIGH_SURROGATE)) &#123;
+                    <span class="hljs-keyword">int</span> supplChar = codePointAt(firstUpper);
+                    <span class="hljs-keyword">if</span> (supplChar != Character.toLowerCase(supplChar)) &#123;
+                        <span class="hljs-keyword">break</span> scan;
+                    &#125;
+                    firstUpper += Character.charCount(supplChar);
+                &#125; <span class="hljs-keyword">else</span> &#123;
+                    <span class="hljs-keyword">if</span> (c != Character.toLowerCase(c)) &#123;
+                        <span class="hljs-keyword">break</span> scan;
+                    &#125;
+                    firstUpper++;
+                &#125;
+            &#125;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+        &#125;
+
+        <span class="hljs-keyword">char</span>[] result = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[len];
+        <span class="hljs-keyword">int</span> resultOffset = <span class="hljs-number">0</span>;  <span class="hljs-comment">/* result may grow, so i+resultOffset</span>
+<span class="hljs-comment">                                * is the write location in result */</span>
+
+        <span class="hljs-comment">/* Just copy the first few lowerCase characters. */</span>
+        System.arraycopy(value, <span class="hljs-number">0</span>, result, <span class="hljs-number">0</span>, firstUpper);
+
+        String lang = locale.getLanguage();
+        <span class="hljs-keyword">boolean</span> localeDependent =
+                (lang == <span class="hljs-string">"tr"</span> || lang == <span class="hljs-string">"az"</span> || lang == <span class="hljs-string">"lt"</span>);
+        <span class="hljs-keyword">char</span>[] lowerCharArray;
+        <span class="hljs-keyword">int</span> lowerChar;
+        <span class="hljs-keyword">int</span> srcChar;
+        <span class="hljs-keyword">int</span> srcCount;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = firstUpper; i &lt; len; i += srcCount) &#123;
+            srcChar = (<span class="hljs-keyword">int</span>)value[i];
+            <span class="hljs-keyword">if</span> ((<span class="hljs-keyword">char</span>)srcChar &gt;= Character.MIN_HIGH_SURROGATE
+                    &amp;&amp; (<span class="hljs-keyword">char</span>)srcChar &lt;= Character.MAX_HIGH_SURROGATE) &#123;
+                srcChar = codePointAt(i);
+                srcCount = Character.charCount(srcChar);
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                srcCount = <span class="hljs-number">1</span>;
+            &#125;
+            <span class="hljs-keyword">if</span> (localeDependent ||
+                srcChar == <span class="hljs-string">'\u03A3'</span> || <span class="hljs-comment">// GREEK CAPITAL LETTER SIGMA</span>
+                srcChar == <span class="hljs-string">'\u0130'</span>) &#123; <span class="hljs-comment">// LATIN CAPITAL LETTER I WITH DOT ABOVE</span>
+                lowerChar = ConditionalSpecialCasing.toLowerCaseEx(<span class="hljs-keyword">this</span>, i, locale);
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                lowerChar = Character.toLowerCase(srcChar);
+            &#125;
+            <span class="hljs-keyword">if</span> ((lowerChar == Character.ERROR)
+                    || (lowerChar &gt;= Character.MIN_SUPPLEMENTARY_CODE_POINT)) &#123;
+                <span class="hljs-keyword">if</span> (lowerChar == Character.ERROR) &#123;
+                    lowerCharArray =
+                            ConditionalSpecialCasing.toLowerCaseCharArray(<span class="hljs-keyword">this</span>, i, locale);
+                &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (srcCount == <span class="hljs-number">2</span>) &#123;
+                    resultOffset += Character.toChars(lowerChar, result, i + resultOffset) - srcCount;
+                    <span class="hljs-keyword">continue</span>;
+                &#125; <span class="hljs-keyword">else</span> &#123;
+                    lowerCharArray = Character.toChars(lowerChar);
+                &#125;
+
+                <span class="hljs-comment">/* Grow result if needed */</span>
+                <span class="hljs-keyword">int</span> mapLen = lowerCharArray.length;
+                <span class="hljs-keyword">if</span> (mapLen &gt; srcCount) &#123;
+                    <span class="hljs-keyword">char</span>[] result2 = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[result.length + mapLen - srcCount];
+                    System.arraycopy(result, <span class="hljs-number">0</span>, result2, <span class="hljs-number">0</span>, i + resultOffset);
+                    result = result2;
+                &#125;
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> x = <span class="hljs-number">0</span>; x &lt; mapLen; ++x) &#123;
+                    result[i + resultOffset + x] = lowerCharArray[x];
+                &#125;
+                resultOffset += (mapLen - srcCount);
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                result[i + resultOffset] = (<span class="hljs-keyword">char</span>)lowerChar;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(result, <span class="hljs-number">0</span>, len + resultOffset);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">toLowerCase</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> toLowerCase(Locale.getDefault());
+    &#125;
+
+    <span class="hljs-comment">//转换为大写</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">toUpperCase</span><span class="hljs-params">(Locale locale)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (locale == <span class="hljs-keyword">null</span>) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NullPointerException();
+        &#125;
+
+        <span class="hljs-keyword">int</span> firstLower;
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> len = value.length;
+
+        <span class="hljs-comment">/* Now check if there are any characters that need to be changed. */</span>
+        scan: &#123;
+            <span class="hljs-keyword">for</span> (firstLower = <span class="hljs-number">0</span> ; firstLower &lt; len; ) &#123;
+                <span class="hljs-keyword">int</span> c = (<span class="hljs-keyword">int</span>)value[firstLower];
+                <span class="hljs-keyword">int</span> srcCount;
+                <span class="hljs-keyword">if</span> ((c &gt;= Character.MIN_HIGH_SURROGATE)
+                        &amp;&amp; (c &lt;= Character.MAX_HIGH_SURROGATE)) &#123;
+                    c = codePointAt(firstLower);
+                    srcCount = Character.charCount(c);
+                &#125; <span class="hljs-keyword">else</span> &#123;
+                    srcCount = <span class="hljs-number">1</span>;
+                &#125;
+                <span class="hljs-keyword">int</span> upperCaseChar = Character.toUpperCaseEx(c);
+                <span class="hljs-keyword">if</span> ((upperCaseChar == Character.ERROR)
+                        || (c != upperCaseChar)) &#123;
+                    <span class="hljs-keyword">break</span> scan;
+                &#125;
+                firstLower += srcCount;
+            &#125;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+        &#125;
+
+        <span class="hljs-comment">/* result may grow, so i+resultOffset is the write location in result */</span>
+        <span class="hljs-keyword">int</span> resultOffset = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">char</span>[] result = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[len]; <span class="hljs-comment">/* may grow */</span>
+
+        <span class="hljs-comment">/* Just copy the first few upperCase characters. */</span>
+        System.arraycopy(value, <span class="hljs-number">0</span>, result, <span class="hljs-number">0</span>, firstLower);
+
+        String lang = locale.getLanguage();
+        <span class="hljs-keyword">boolean</span> localeDependent =
+                (lang == <span class="hljs-string">"tr"</span> || lang == <span class="hljs-string">"az"</span> || lang == <span class="hljs-string">"lt"</span>);
+        <span class="hljs-keyword">char</span>[] upperCharArray;
+        <span class="hljs-keyword">int</span> upperChar;
+        <span class="hljs-keyword">int</span> srcChar;
+        <span class="hljs-keyword">int</span> srcCount;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = firstLower; i &lt; len; i += srcCount) &#123;
+            srcChar = (<span class="hljs-keyword">int</span>)value[i];
+            <span class="hljs-keyword">if</span> ((<span class="hljs-keyword">char</span>)srcChar &gt;= Character.MIN_HIGH_SURROGATE &amp;&amp;
+                (<span class="hljs-keyword">char</span>)srcChar &lt;= Character.MAX_HIGH_SURROGATE) &#123;
+                srcChar = codePointAt(i);
+                srcCount = Character.charCount(srcChar);
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                srcCount = <span class="hljs-number">1</span>;
+            &#125;
+            <span class="hljs-keyword">if</span> (localeDependent) &#123;
+                upperChar = ConditionalSpecialCasing.toUpperCaseEx(<span class="hljs-keyword">this</span>, i, locale);
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                upperChar = Character.toUpperCaseEx(srcChar);
+            &#125;
+            <span class="hljs-keyword">if</span> ((upperChar == Character.ERROR)
+                    || (upperChar &gt;= Character.MIN_SUPPLEMENTARY_CODE_POINT)) &#123;
+                <span class="hljs-keyword">if</span> (upperChar == Character.ERROR) &#123;
+                    <span class="hljs-keyword">if</span> (localeDependent) &#123;
+                        upperCharArray =
+                                ConditionalSpecialCasing.toUpperCaseCharArray(<span class="hljs-keyword">this</span>, i, locale);
+                    &#125; <span class="hljs-keyword">else</span> &#123;
+                        upperCharArray = Character.toUpperCaseCharArray(srcChar);
+                    &#125;
+                &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (srcCount == <span class="hljs-number">2</span>) &#123;
+                    resultOffset += Character.toChars(upperChar, result, i + resultOffset) - srcCount;
+                    <span class="hljs-keyword">continue</span>;
+                &#125; <span class="hljs-keyword">else</span> &#123;
+                    upperCharArray = Character.toChars(upperChar);
+                &#125;
+
+                <span class="hljs-comment">/* Grow result if needed */</span>
+                <span class="hljs-keyword">int</span> mapLen = upperCharArray.length;
+                <span class="hljs-keyword">if</span> (mapLen &gt; srcCount) &#123;
+                    <span class="hljs-keyword">char</span>[] result2 = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[result.length + mapLen - srcCount];
+                    System.arraycopy(result, <span class="hljs-number">0</span>, result2, <span class="hljs-number">0</span>, i + resultOffset);
+                    result = result2;
+                &#125;
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> x = <span class="hljs-number">0</span>; x &lt; mapLen; ++x) &#123;
+                    result[i + resultOffset + x] = upperCharArray[x];
+                &#125;
+                resultOffset += (mapLen - srcCount);
+            &#125; <span class="hljs-keyword">else</span> &#123;
+                result[i + resultOffset] = (<span class="hljs-keyword">char</span>)upperChar;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(result, <span class="hljs-number">0</span>, len + resultOffset);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">toUpperCase</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> toUpperCase(Locale.getDefault());
+    &#125;
+
+    <span class="hljs-comment">//去除两边空格,本质进行字符串的分割</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">trim</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">int</span> len = value.length;
+        <span class="hljs-keyword">int</span> st = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">char</span>[] val = value;    <span class="hljs-comment">/* avoid getfield opcode */</span>
+
+        <span class="hljs-keyword">while</span> ((st &lt; len) &amp;&amp; (val[st] &lt;= <span class="hljs-string">' '</span>)) &#123;
+            st++;
+        &#125;
+        <span class="hljs-keyword">while</span> ((st &lt; len) &amp;&amp; (val[len - <span class="hljs-number">1</span>] &lt;= <span class="hljs-string">' '</span>)) &#123;
+            len--;
+        &#125;
+        <span class="hljs-keyword">return</span> ((st &gt; <span class="hljs-number">0</span>) || (len &lt; value.length)) ? substring(st, len) : <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">//转换为字符串，返回本身</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">toString</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">//转换为字符数组</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">char</span>[] toCharArray() &#123;
+        <span class="hljs-comment">// Cannot use Arrays.copyOf because of class initialization order issues</span>
+        <span class="hljs-keyword">char</span> result[] = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[value.length];
+        System.arraycopy(value, <span class="hljs-number">0</span>, result, <span class="hljs-number">0</span>, value.length);
+        <span class="hljs-keyword">return</span> result;
+    &#125;
+
+    <span class="hljs-comment">//字符串格式化</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">format</span><span class="hljs-params">(String format, Object... args)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Formatter().format(format, args).toString();
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">format</span><span class="hljs-params">(Locale l, String format, Object... args)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Formatter(l).format(format, args).toString();
+    &#125;
+
+    <span class="hljs-comment">//转换为字符串</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">valueOf</span><span class="hljs-params">(Object obj)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> (obj == <span class="hljs-keyword">null</span>) ? <span class="hljs-string">"null"</span> : obj.toString();
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">valueOf</span><span class="hljs-params">(<span class="hljs-keyword">char</span> data[])</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(data);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">valueOf</span><span class="hljs-params">(<span class="hljs-keyword">char</span> data[], <span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> count)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(data, offset, count);
+    &#125;
+
+    <span class="hljs-comment">//字符串数据复制</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">copyValueOf</span><span class="hljs-params">(<span class="hljs-keyword">char</span> data[], <span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> count)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(data, offset, count);
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">copyValueOf</span><span class="hljs-params">(<span class="hljs-keyword">char</span> data[])</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(data);
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">valueOf</span><span class="hljs-params">(<span class="hljs-keyword">boolean</span> b)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> b ? <span class="hljs-string">"true"</span> : <span class="hljs-string">"false"</span>;
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">valueOf</span><span class="hljs-params">(<span class="hljs-keyword">char</span> c)</span> </span>&#123;
+        <span class="hljs-keyword">char</span> data[] = &#123;c&#125;;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(data, <span class="hljs-keyword">true</span>);
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">valueOf</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> Integer.toString(i);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">valueOf</span><span class="hljs-params">(<span class="hljs-keyword">long</span> l)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> Long.toString(l);
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">valueOf</span><span class="hljs-params">(<span class="hljs-keyword">float</span> f)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> Float.toString(f);
+    &#125;
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title">valueOf</span><span class="hljs-params">(<span class="hljs-keyword">double</span> d)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> Double.toString(d);
+    &#125;
+
+    <span class="hljs-comment">//返回常量池的引用，如果没有则会加入</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> String <span class="hljs-title">intern</span><span class="hljs-params">()</span></span>;
+&#125;</code></pre>
+
+
+
+
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/java%E5%9F%BA%E7%A1%80/">java基础</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/String%E7%B1%BB/">String类</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/11/07/stringBuffer/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">StringBuffer类探究</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/09/27/oauth2/">
+                        <span class="hidden-mobile">基于OAuth2和spring-security的token认证的实现</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <script defer src="https://utteranc.es/client.js"
+          repo="zzzyyyzhuyu/zzzyyyzhuyu.github.io"
+          issue-term="pathname"
+  
+          label="utterances"
+    
+          theme="github-light"
+          crossorigin="anonymous"
+  >
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+  <div class="col-lg-7 mx-auto nopadding-md">
+    <div class="container custom post-content mx-auto">
+      <img src="https://octodex.github.com/images/jetpacktocat.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:150px; height:150px;">
+    </div>
+  </div>
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div>
+    
+      <!-- 不蒜子统计PV -->
+      
+      <span id="busuanzi_container_site_pv" style="display: none">
+      总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    </span>
+    
+    
+      <!-- 不蒜子统计UV -->
+      
+      <span id="busuanzi_container_site_uv" style="display: none">
+      总访客数 <span id="busuanzi_value_site_uv"></span> 人
+    </span>
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "String类探究&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+  
+  
+    <script>
+      !function (e, t, a) {
+        function r() {
+          for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999");
+          requestAnimationFrame(r)
+        }
+
+        function n() {
+          var t = "function" == typeof e.onclick && e.onclick;
+          e.onclick = function (e) {
+            t && t(), o(e)
+          }
+        }
+
+        function o(e) {
+          var a = t.createElement("div");
+          a.className = "heart", s.push({
+            el: a,
+            x: e.clientX - 5,
+            y: e.clientY - 5,
+            scale: 1,
+            alpha: 1,
+            color: c()
+          }), t.body.appendChild(a)
+        }
+
+        function i(e) {
+          var a = t.createElement("style");
+          a.type = "text/css";
+          try {
+            a.appendChild(t.createTextNode(e))
+          } catch (t) {
+            a.styleSheet.cssText = e
+          }
+          t.getElementsByTagName("head")[0].appendChild(a)
+        }
+
+        function c() {
+          return "rgb(" + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + ")"
+        }
+
+        var s = [];
+        e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame || function (e) {
+          setTimeout(e, 1e3 / 60)
+        }, i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"), n(), r()
+      }(window, document);
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

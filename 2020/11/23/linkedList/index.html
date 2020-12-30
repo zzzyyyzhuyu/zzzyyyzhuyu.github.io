@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/favicon.png">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="ever ever ever">
+  <meta name="author" content="Wimp">
+  <meta name="keywords" content="">
+  <title>LinkedList类探究 - Wimp</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_fmb4a04yx8h.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Wimp</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              <i class="iconfont icon-home-fill"></i>
+              首页</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">
+              <i class="iconfont icon-archive-fill"></i>
+              归档</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">
+              <i class="iconfont icon-category-fill"></i>
+              分类</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">
+              <i class="iconfont icon-tags-fill"></i>
+              标签</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">
+              <i class="iconfont icon-user-fill"></i>
+              关于</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/links/">
+              <i class="iconfont icon-link-fill"></i>
+              友链</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/images/chihiro.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+                <div class="mt-3 post-meta">
+                  <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+                  <time datetime="2020-11-23 16:57">
+                    2020年11月23日 下午
+                  </time>
+                </div>
+              
+
+              <div class="mt-1">
+                
+                  
+                  <span class="post-meta mr-2">
+                    <i class="iconfont icon-chart"></i>
+                    4.3k 字
+                  </span>
+                
+
+                
+                  
+                  <span class="post-meta mr-2">
+                      <i class="iconfont icon-clock-fill"></i>
+                    
+                    
+                    74
+                     分钟
+                  </span>
+                
+
+                
+              </div>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2020年12月30日 上午
+                
+              </p>
+            
+            <article class="markdown-body">
+              <h1 id="LinkedList探究"><a href="#LinkedList探究" class="headerlink" title="LinkedList探究"></a>LinkedList探究</h1><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><ul>
+<li>实现List、Deque接口,AbstractSequentialList</li>
+<li>基于链表实现，内部维护双向链表</li>
+<li>便利查找效率低（链表），但插入删除效率高（链表）</li>
+</ul>
+<h4 id="Tips、"><a href="#Tips、" class="headerlink" title="Tips、"></a>Tips、</h4><ul>
+<li>修改效率高，修改情况较多情况下使用</li>
+<li>默认容量大小为？</li>
+</ul>
+<h4 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h4><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LinkedList</span>&lt;<span class="hljs-title">E</span>&gt;</span>
+<span class="hljs-class">    <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractSequentialList</span>&lt;<span class="hljs-title">E</span>&gt;</span>
+<span class="hljs-class">    <span class="hljs-keyword">implements</span> <span class="hljs-title">List</span>&lt;<span class="hljs-title">E</span>&gt;, <span class="hljs-title">Deque</span>&lt;<span class="hljs-title">E</span>&gt;, <span class="hljs-title">Cloneable</span>, <span class="hljs-title">java</span>.<span class="hljs-title">io</span>.<span class="hljs-title">Serializable</span></span>
+<span class="hljs-class"></span>&#123;
+    <span class="hljs-keyword">transient</span> <span class="hljs-keyword">int</span> size = <span class="hljs-number">0</span>;
+
+    <span class="hljs-comment">//头结点</span>
+    <span class="hljs-keyword">transient</span> Node&lt;E&gt; first;
+
+    <span class="hljs-comment">//尾结点</span>
+    <span class="hljs-keyword">transient</span> Node&lt;E&gt; last;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">LinkedList</span><span class="hljs-params">()</span> </span>&#123;
+    &#125;
+
+    <span class="hljs-comment">//根据指定集合 创建LinkedList</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">LinkedList</span><span class="hljs-params">(Collection&lt;? extends E&gt; c)</span> </span>&#123;
+        <span class="hljs-keyword">this</span>();
+        addAll(c);
+    &#125;
+
+    <span class="hljs-comment">//根据当前参数 创建结点，当前参数为头结点</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">linkFirst</span><span class="hljs-params">(E e)</span> </span>&#123;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; f = first;
+        <span class="hljs-comment">//创建新节点</span>
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; newNode = <span class="hljs-keyword">new</span> Node&lt;&gt;(<span class="hljs-keyword">null</span>, e, f);
+        <span class="hljs-comment">//头结点指向当前节点</span>
+        first = newNode;
+        <span class="hljs-keyword">if</span> (f == <span class="hljs-keyword">null</span>)
+            <span class="hljs-comment">//之前头结点为空，说明是空链表</span>
+            last = newNode;
+        <span class="hljs-keyword">else</span>
+            <span class="hljs-comment">//不为空，则将之前节点的前驱指向新节点</span>
+            f.prev = newNode;
+        <span class="hljs-comment">//长度增加</span>
+        size++;
+        <span class="hljs-comment">//修改次数（版本号）自增</span>
+        modCount++;
+    &#125;
+    
+    <span class="hljs-comment">//尾结点插入节点    </span>
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">linkLast</span><span class="hljs-params">(E e)</span> </span>&#123;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; l = last;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; newNode = <span class="hljs-keyword">new</span> Node&lt;&gt;(l, e, <span class="hljs-keyword">null</span>);
+        <span class="hljs-comment">//尾结点指向新节点</span>
+        last = newNode;
+        <span class="hljs-keyword">if</span> (l == <span class="hljs-keyword">null</span>)
+            <span class="hljs-comment">//上一任头结点为空，则说明链表为开孔，头结点也指向该节点</span>
+            first = newNode;
+        <span class="hljs-keyword">else</span>
+            <span class="hljs-comment">//不为空，则将前节点的后驱指向新节点</span>
+            l.next = newNode;
+        <span class="hljs-comment">//长度增加</span>
+        size++;
+        <span class="hljs-comment">//版本号增加</span>
+        modCount++;
+    &#125;
+
+    <span class="hljs-comment">//在给定节点前驱插入节点</span>
+    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">linkBefore</span><span class="hljs-params">(E e, Node&lt;E&gt; succ)</span> </span>&#123;
+        <span class="hljs-comment">// assert succ != null;</span>
+        <span class="hljs-comment">//给定节点前驱结点</span>
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; pred = succ.prev;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; newNode = <span class="hljs-keyword">new</span> Node&lt;&gt;(pred, e, succ);
+        <span class="hljs-comment">//给定节点前驱指向新节点</span>
+        succ.prev = newNode;
+        <span class="hljs-keyword">if</span> (pred == <span class="hljs-keyword">null</span>)
+            <span class="hljs-comment">//原前驱节点为空时，新节点即为头结点</span>
+            first = newNode;
+        <span class="hljs-keyword">else</span>
+            <span class="hljs-comment">//原前驱节点不为空，原前驱节点后驱指向新节点</span>
+            pred.next = newNode;
+        <span class="hljs-comment">//长度增加</span>
+        size++;
+        <span class="hljs-comment">//版本号增加</span>
+        modCount++;
+    &#125;
+
+    <span class="hljs-comment">//去除头部节点（内部方法）</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> E <span class="hljs-title">unlinkFirst</span><span class="hljs-params">(Node&lt;E&gt; f)</span> </span>&#123;
+        <span class="hljs-comment">// assert f == first &amp;&amp; f != null;</span>
+        <span class="hljs-keyword">final</span> E element = f.item;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; next = f.next;
+        <span class="hljs-comment">//当前节点置空</span>
+        f.item = <span class="hljs-keyword">null</span>;
+        f.next = <span class="hljs-keyword">null</span>; <span class="hljs-comment">// help GC</span>
+        <span class="hljs-comment">//头结点指向当前节点的下一个节点</span>
+        first = next;
+        <span class="hljs-keyword">if</span> (next == <span class="hljs-keyword">null</span>)
+            <span class="hljs-comment">//当前节点为空，尾节点也为空</span>
+            last = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">else</span>
+            <span class="hljs-comment">//节点的前驱设为空</span>
+            next.prev = <span class="hljs-keyword">null</span>;
+        <span class="hljs-comment">//长度减1</span>
+        size--;
+        <span class="hljs-comment">//版本号+1</span>
+        modCount++;
+        <span class="hljs-comment">//返回当前节点</span>
+        <span class="hljs-keyword">return</span> element;
+    &#125;
+
+    <span class="hljs-comment">//删除尾结点（内部方法）</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> E <span class="hljs-title">unlinkLast</span><span class="hljs-params">(Node&lt;E&gt; l)</span> </span>&#123;
+        <span class="hljs-comment">// assert l == last &amp;&amp; l != null;</span>
+        <span class="hljs-keyword">final</span> E element = l.item;
+        <span class="hljs-comment">//获取前驱引用</span>
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; prev = l.prev;
+        <span class="hljs-comment">//删除当前引用</span>
+        l.item = <span class="hljs-keyword">null</span>;
+        l.prev = <span class="hljs-keyword">null</span>; <span class="hljs-comment">// help GC</span>
+        last = prev;
+        <span class="hljs-keyword">if</span> (prev == <span class="hljs-keyword">null</span>)
+            <span class="hljs-comment">//前驱为空，代表头结点也为空</span>
+            first = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">else</span>
+            <span class="hljs-comment">//前驱后继为空</span>
+            prev.next = <span class="hljs-keyword">null</span>;
+        size--;
+        modCount++;
+        <span class="hljs-keyword">return</span> element;
+    &#125;
+
+    <span class="hljs-comment">//移除任意一个节点(内部节点)</span>
+    <span class="hljs-function">E <span class="hljs-title">unlink</span><span class="hljs-params">(Node&lt;E&gt; x)</span> </span>&#123;
+        <span class="hljs-comment">// assert x != null;</span>
+        <span class="hljs-keyword">final</span> E element = x.item;
+        <span class="hljs-comment">//获取当前节点的后继</span>
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; next = x.next;
+        <span class="hljs-comment">//获取当前节点的前继</span>
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; prev = x.prev;
+        
+        <span class="hljs-keyword">if</span> (prev == <span class="hljs-keyword">null</span>) &#123;
+            <span class="hljs-comment">//当前节点前驱为空，移除当前节点后，当前节点后继为头结点</span>
+            first = next;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-comment">//前驱的后继为当前节点后继</span>
+            prev.next = next;
+            <span class="hljs-comment">//当前节点前驱为空</span>
+            x.prev = <span class="hljs-keyword">null</span>;
+        &#125;
+
+        <span class="hljs-keyword">if</span> (next == <span class="hljs-keyword">null</span>) &#123;
+            当前节点后驱为空，移除当前节点后，当前节点的前驱为尾结点
+            last = prev;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-comment">//后继的前驱当前节点的前驱</span>
+            next.prev = prev;
+            <span class="hljs-comment">//当前节点的后继为空</span>
+            x.next = <span class="hljs-keyword">null</span>;
+        &#125;
+        <span class="hljs-comment">//当前节点设为空</span>
+        x.item = <span class="hljs-keyword">null</span>;
+        <span class="hljs-comment">//长度自减</span>
+        size--;
+        <span class="hljs-comment">//版本号自增</span>
+        modCount++;
+        <span class="hljs-comment">//返回当前节点</span>
+        <span class="hljs-keyword">return</span> element;
+    &#125;
+
+    <span class="hljs-comment">//获取头结点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">getFirst</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; f = first;
+        <span class="hljs-keyword">if</span> (f == <span class="hljs-keyword">null</span>)
+            <span class="hljs-comment">//空值校验</span>
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NoSuchElementException();
+        <span class="hljs-keyword">return</span> f.item;
+    &#125;
+
+    <span class="hljs-comment">//获取尾节点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">getLast</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; l = last;
+        <span class="hljs-keyword">if</span> (l == <span class="hljs-keyword">null</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NoSuchElementException();
+        <span class="hljs-keyword">return</span> l.item;
+    &#125;
+
+    <span class="hljs-comment">//移除头结点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">removeFirst</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; f = first;
+        <span class="hljs-comment">//非空判断</span>
+        <span class="hljs-keyword">if</span> (f == <span class="hljs-keyword">null</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NoSuchElementException();
+        <span class="hljs-comment">//移除头结点方法</span>
+        <span class="hljs-keyword">return</span> unlinkFirst(f);
+    &#125;
+
+    <span class="hljs-comment">//移除尾结点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">removeLast</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; l = last;
+        <span class="hljs-comment">//非空判断</span>
+        <span class="hljs-keyword">if</span> (l == <span class="hljs-keyword">null</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NoSuchElementException();
+        <span class="hljs-comment">//移除尾部节点</span>
+        <span class="hljs-keyword">return</span> unlinkLast(l);
+    &#125;
+
+    <span class="hljs-comment">//在头部增加节点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">addFirst</span><span class="hljs-params">(E e)</span> </span>&#123;
+        <span class="hljs-comment">//连接头结点方法（内部）</span>
+        linkFirst(e);
+    &#125;
+
+    <span class="hljs-comment">//在尾部新增</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">addLast</span><span class="hljs-params">(E e)</span> </span>&#123;
+        linkLast(e);
+    &#125;
+
+    <span class="hljs-comment">//判断是否包含</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">contains</span><span class="hljs-params">(Object o)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> indexOf(o) != -<span class="hljs-number">1</span>;
+    &#125;
+
+    <span class="hljs-comment">//获取链表长度</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">size</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> size;
+    &#125;
+
+    <span class="hljs-comment">//添加节点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">add</span><span class="hljs-params">(E e)</span> </span>&#123;
+        <span class="hljs-comment">//在尾部新增</span>
+        linkLast(e);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125;
+
+    <span class="hljs-comment">//删除某个节点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">remove</span><span class="hljs-params">(Object o)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (o == <span class="hljs-keyword">null</span>) &#123;
+            <span class="hljs-comment">//为null时候情况</span>
+            <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = first; x != <span class="hljs-keyword">null</span>; x = x.next) &#123;
+                <span class="hljs-keyword">if</span> (x.item == <span class="hljs-keyword">null</span>) &#123;
+                    unlink(x);
+                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+                &#125;
+            &#125;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = first; x != <span class="hljs-keyword">null</span>; x = x.next) &#123;
+                <span class="hljs-keyword">if</span> (o.equals(x.item)) &#123;
+                    unlink(x);
+                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+                &#125;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+    &#125;
+    <span class="hljs-comment">//从给定集合添加全部节点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">addAll</span><span class="hljs-params">(Collection&lt;? extends E&gt; c)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> addAll(size, c);
+    &#125;
+
+    <span class="hljs-comment">//添加全部节点具体方法（index节点前插入）</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">addAll</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index, Collection&lt;? extends E&gt; c)</span> </span>&#123;
+        checkPositionIndex(index);
+        <span class="hljs-comment">//集合转换为数组</span>
+        Object[] a = c.toArray();
+        <span class="hljs-keyword">int</span> numNew = a.length;
+        <span class="hljs-keyword">if</span> (numNew == <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        <span class="hljs-comment">//获取当前要插入的节点</span>
+        Node&lt;E&gt; pred, succ;
+        <span class="hljs-keyword">if</span> (index == size) &#123;
+            succ = <span class="hljs-keyword">null</span>;
+            pred = last;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            succ = node(index);
+            pred = succ.prev;
+        &#125;
+        
+        <span class="hljs-comment">//循环插入节点    </span>
+        <span class="hljs-keyword">for</span> (Object o : a) &#123;
+            <span class="hljs-meta">@SuppressWarnings</span>(<span class="hljs-string">"unchecked"</span>) E e = (E) o;
+            Node&lt;E&gt; newNode = <span class="hljs-keyword">new</span> Node&lt;&gt;(pred, e, <span class="hljs-keyword">null</span>);
+            <span class="hljs-keyword">if</span> (pred == <span class="hljs-keyword">null</span>)
+                <span class="hljs-comment">//前继为空，当前节点为头结点</span>
+                first = newNode;
+            <span class="hljs-keyword">else</span>
+                <span class="hljs-comment">//千集结点后续为新节点</span>
+                pred.next = newNode;
+            pred = newNode;
+        &#125;
+        
+          
+        <span class="hljs-keyword">if</span> (succ == <span class="hljs-keyword">null</span>) &#123;
+            <span class="hljs-comment">//succ节点为空，当前的节点就为尾部节点</span>
+            last = pred;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-comment">//当前节点的后继为succ</span>
+            pred.next = succ;
+            <span class="hljs-comment">//succ的前为当前节点</span>
+            succ.prev = pred;
+        &#125;
+        <span class="hljs-comment">//长度修改</span>
+        size += numNew;
+        <span class="hljs-comment">//版本号自增</span>
+        modCount++;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125;
+
+    <span class="hljs-comment">//清空当前链表</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">clear</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-comment">//逐个清空节点</span>
+        <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = first; x != <span class="hljs-keyword">null</span>; ) &#123;
+            <span class="hljs-comment">//获取当前节点的后继的引用</span>
+            Node&lt;E&gt; next = x.next;
+            <span class="hljs-comment">//当前节点置空</span>
+            x.item = <span class="hljs-keyword">null</span>;
+            x.next = <span class="hljs-keyword">null</span>;
+            x.prev = <span class="hljs-keyword">null</span>;
+            <span class="hljs-comment">//x指向后继节点</span>
+            x = next;
+        &#125;
+        <span class="hljs-comment">//头尾节点置空</span>
+        first = last = <span class="hljs-keyword">null</span>;
+        <span class="hljs-comment">//长度置为0</span>
+        size = <span class="hljs-number">0</span>;
+        <span class="hljs-comment">//版本号自增</span>
+        modCount++;
+    &#125;
+
+
+    <span class="hljs-comment">// Positional Access Operations</span>
+
+    <span class="hljs-comment">//获取当前下标节点的值</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">get</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-comment">//是否越界校验</span>
+        checkElementIndex(index);
+        <span class="hljs-keyword">return</span> node(index).item;
+    &#125;
+
+    <span class="hljs-comment">//给定下标链表设置为给定元素</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">set</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index, E element)</span> </span>&#123;
+        checkElementIndex(index);
+        Node&lt;E&gt; x = node(index);
+        E oldVal = x.item;
+        x.item = element;
+        <span class="hljs-keyword">return</span> oldVal;
+    &#125;
+
+    <span class="hljs-comment">//在制定位置新增节点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index, E element)</span> </span>&#123;
+        checkPositionIndex(index);
+
+        <span class="hljs-keyword">if</span> (index == size)
+            <span class="hljs-comment">//如果为尾部，直接在尾部新增</span>
+            linkLast(element);
+        <span class="hljs-keyword">else</span>
+            <span class="hljs-comment">//不是尾部，则在当前节点前新增</span>
+            linkBefore(element, node(index));
+    &#125;
+
+    <span class="hljs-comment">//删除某个下标的节点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">remove</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-comment">//边界校验</span>
+        checkElementIndex(index);
+        <span class="hljs-keyword">return</span> unlink(node(index));
+    &#125;
+
+    <span class="hljs-comment">//判断当前下标是否存在</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">isElementIndex</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> index &gt;= <span class="hljs-number">0</span> &amp;&amp; index &lt; size;
+    &#125;
+
+    <span class="hljs-comment">//判断索引是否越界</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">isPositionIndex</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> index &gt;= <span class="hljs-number">0</span> &amp;&amp; index &lt;= size;
+    &#125;
+
+ 
+    <span class="hljs-function"><span class="hljs-keyword">private</span> String <span class="hljs-title">outOfBoundsMsg</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">"Index: "</span>+index+<span class="hljs-string">", Size: "</span>+size;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">checkElementIndex</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (!isElementIndex(index))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IndexOutOfBoundsException(outOfBoundsMsg(index));
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">checkPositionIndex</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (!isPositionIndex(index))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IndexOutOfBoundsException(outOfBoundsMsg(index));
+    &#125;
+
+    <span class="hljs-comment">//获取当前下标的节点</span>
+    <span class="hljs-function">Node&lt;E&gt; <span class="hljs-title">node</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-comment">// assert isElementIndex(index);</span>
+        
+        <span class="hljs-keyword">if</span> (index &lt; (size &gt;&gt; <span class="hljs-number">1</span>)) &#123;
+            <span class="hljs-comment">//在左侧部分，从头开始寻找</span>
+            Node&lt;E&gt; x = first;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; index; i++)
+                x = x.next;
+            <span class="hljs-keyword">return</span> x;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-comment">//在右侧部分，从尾开始寻找</span>
+            Node&lt;E&gt; x = last;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = size - <span class="hljs-number">1</span>; i &gt; index; i--)
+                x = x.prev;
+            <span class="hljs-keyword">return</span> x;
+        &#125;
+    &#125;
+
+    <span class="hljs-comment">// Search Operations</span>
+    
+    <span class="hljs-comment">//获取当前元素下标（从头开始找，首次）</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(Object o)</span> </span>&#123;
+        <span class="hljs-keyword">int</span> index = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">if</span> (o == <span class="hljs-keyword">null</span>) &#123;
+            <span class="hljs-comment">//为null时循环判断</span>
+            <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = first; x != <span class="hljs-keyword">null</span>; x = x.next) &#123;
+                <span class="hljs-keyword">if</span> (x.item == <span class="hljs-keyword">null</span>)
+                    <span class="hljs-keyword">return</span> index;
+                index++;
+            &#125;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-comment">//不为空时</span>
+            <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = first; x != <span class="hljs-keyword">null</span>; x = x.next) &#123;
+                <span class="hljs-keyword">if</span> (o.equals(x.item))
+                    <span class="hljs-keyword">return</span> index;
+                index++;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
+    &#125;
+    
+    <span class="hljs-comment">//获取当前元素最后出现的下标（从尾部开始找）</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(Object o)</span> </span>&#123;
+        <span class="hljs-keyword">int</span> index = size;
+        <span class="hljs-keyword">if</span> (o == <span class="hljs-keyword">null</span>) &#123;
+            <span class="hljs-comment">//为空时尾部开始都查找</span>
+            <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = last; x != <span class="hljs-keyword">null</span>; x = x.prev) &#123;
+                index--;
+                <span class="hljs-keyword">if</span> (x.item == <span class="hljs-keyword">null</span>)
+                    <span class="hljs-keyword">return</span> index;
+            &#125;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-comment">//非空时尾部开始倒序查找</span>
+            <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = last; x != <span class="hljs-keyword">null</span>; x = x.prev) &#123;
+                index--;
+                <span class="hljs-keyword">if</span> (o.equals(x.item))
+                    <span class="hljs-keyword">return</span> index;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
+    &#125;
+
+    <span class="hljs-comment">// Queue operations.</span>
+
+    <span class="hljs-comment">//队列peek方法</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">peek</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-comment">//返回头结点</span>
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; f = first;
+        <span class="hljs-keyword">return</span> (f == <span class="hljs-keyword">null</span>) ? <span class="hljs-keyword">null</span> : f.item;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Retrieves, but does not remove, the head (first element) of this list.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@return</span> the head of this list</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> NoSuchElementException if this list is empty</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span> 1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">element</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> getFirst();
+    &#125;
+
+    <span class="hljs-comment">//队列poll方法</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">poll</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-comment">//头结点出队列</span>
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; f = first;
+        <span class="hljs-keyword">return</span> (f == <span class="hljs-keyword">null</span>) ? <span class="hljs-keyword">null</span> : unlinkFirst(f);
+    &#125;
+    
+    <span class="hljs-comment">//删除节点（删除头）</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">remove</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> removeFirst();
+    &#125;
+
+    <span class="hljs-comment">//队列offer方法（尾部添加）</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">offer</span><span class="hljs-params">(E e)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> add(e);
+    &#125;
+
+    <span class="hljs-comment">// Deque operations</span>
+    
+    <span class="hljs-comment">//首部压入队列</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">offerFirst</span><span class="hljs-params">(E e)</span> </span>&#123;
+        addFirst(e);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125;
+    
+    <span class="hljs-comment">//尾部压入队列</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">offerLast</span><span class="hljs-params">(E e)</span> </span>&#123;
+        addLast(e);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+    &#125;
+
+    <span class="hljs-comment">//获取头部节点值</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">peekFirst</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; f = first;
+        <span class="hljs-keyword">return</span> (f == <span class="hljs-keyword">null</span>) ? <span class="hljs-keyword">null</span> : f.item;
+     &#125;
+
+    <span class="hljs-comment">//获取尾部节点值</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">peekLast</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; l = last;
+        <span class="hljs-keyword">return</span> (l == <span class="hljs-keyword">null</span>) ? <span class="hljs-keyword">null</span> : l.item;
+    &#125;
+
+    <span class="hljs-comment">//头部出队列</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">pollFirst</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; f = first;
+        <span class="hljs-comment">//不为空时头部节点取消连接</span>
+        <span class="hljs-keyword">return</span> (f == <span class="hljs-keyword">null</span>) ? <span class="hljs-keyword">null</span> : unlinkFirst(f);
+    &#125;
+
+    <span class="hljs-comment">//尾部出队列</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">pollLast</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">final</span> Node&lt;E&gt; l = last;
+        <span class="hljs-keyword">return</span> (l == <span class="hljs-keyword">null</span>) ? <span class="hljs-keyword">null</span> : unlinkLast(l);
+    &#125;
+
+    <span class="hljs-comment">//push入队列（头部入）</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">push</span><span class="hljs-params">(E e)</span> </span>&#123;
+        addFirst(e);
+    &#125;
+
+    <span class="hljs-comment">//出队列（头部出）</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">pop</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> removeFirst();
+    &#125;
+
+    <span class="hljs-comment">//移除首次出现节点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">removeFirstOccurrence</span><span class="hljs-params">(Object o)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> remove(o);
+    &#125;
+
+    <span class="hljs-comment">//移除最后一次出现节点</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">removeLastOccurrence</span><span class="hljs-params">(Object o)</span> </span>&#123;
+        <span class="hljs-comment">//从尾部开始倒序寻找</span>
+        <span class="hljs-keyword">if</span> (o == <span class="hljs-keyword">null</span>) &#123;
+            <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = last; x != <span class="hljs-keyword">null</span>; x = x.prev) &#123;
+                <span class="hljs-keyword">if</span> (x.item == <span class="hljs-keyword">null</span>) &#123;
+                    unlink(x);
+                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+                &#125;
+            &#125;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = last; x != <span class="hljs-keyword">null</span>; x = x.prev) &#123;
+                <span class="hljs-keyword">if</span> (o.equals(x.item)) &#123;
+                    unlink(x);
+                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+                &#125;
+            &#125;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Returns a list-iterator of the elements in this list (in proper</span>
+<span class="hljs-comment">     * sequence), starting at the specified position in the list.</span>
+<span class="hljs-comment">     * Obeys the general contract of &#123;<span class="hljs-doctag">@code</span> List.listIterator(int)&#125;.&lt;p&gt;</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * The list-iterator is &lt;i&gt;fail-fast&lt;/i&gt;: if the list is structurally</span>
+<span class="hljs-comment">     * modified at any time after the Iterator is created, in any way except</span>
+<span class="hljs-comment">     * through the list-iterator's own &#123;<span class="hljs-doctag">@code</span> remove&#125; or &#123;<span class="hljs-doctag">@code</span> add&#125;</span>
+<span class="hljs-comment">     * methods, the list-iterator will throw a</span>
+<span class="hljs-comment">     * &#123;<span class="hljs-doctag">@code</span> ConcurrentModificationException&#125;.  Thus, in the face of</span>
+<span class="hljs-comment">     * concurrent modification, the iterator fails quickly and cleanly, rather</span>
+<span class="hljs-comment">     * than risking arbitrary, non-deterministic behavior at an undetermined</span>
+<span class="hljs-comment">     * time in the future.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@param</span> index index of the first element to be returned from the</span>
+<span class="hljs-comment">     *              list-iterator (by a call to &#123;<span class="hljs-doctag">@code</span> next&#125;)</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@return</span> a ListIterator of the elements in this list (in proper</span>
+<span class="hljs-comment">     *         sequence), starting at the specified position in the list</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@see</span> List#listIterator(int)</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> ListIterator&lt;E&gt; <span class="hljs-title">listIterator</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        checkPositionIndex(index);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> ListItr(index);
+    &#125;
+
+    <span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ListItr</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">ListIterator</span>&lt;<span class="hljs-title">E</span>&gt; </span>&#123;
+        <span class="hljs-keyword">private</span> Node&lt;E&gt; lastReturned;
+        <span class="hljs-keyword">private</span> Node&lt;E&gt; next;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> nextIndex;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> expectedModCount = modCount;
+
+        ListItr(<span class="hljs-keyword">int</span> index) &#123;
+            <span class="hljs-comment">// assert isPositionIndex(index);</span>
+            next = (index == size) ? <span class="hljs-keyword">null</span> : node(index);
+            nextIndex = index;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">hasNext</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">return</span> nextIndex &lt; size;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">next</span><span class="hljs-params">()</span> </span>&#123;
+            checkForComodification();
+            <span class="hljs-keyword">if</span> (!hasNext())
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NoSuchElementException();
+
+            lastReturned = next;
+            next = next.next;
+            nextIndex++;
+            <span class="hljs-keyword">return</span> lastReturned.item;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">hasPrevious</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">return</span> nextIndex &gt; <span class="hljs-number">0</span>;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">previous</span><span class="hljs-params">()</span> </span>&#123;
+            checkForComodification();
+            <span class="hljs-keyword">if</span> (!hasPrevious())
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NoSuchElementException();
+
+            lastReturned = next = (next == <span class="hljs-keyword">null</span>) ? last : next.prev;
+            nextIndex--;
+            <span class="hljs-keyword">return</span> lastReturned.item;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">nextIndex</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">return</span> nextIndex;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">previousIndex</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">return</span> nextIndex - <span class="hljs-number">1</span>;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">remove</span><span class="hljs-params">()</span> </span>&#123;
+            checkForComodification();
+            <span class="hljs-keyword">if</span> (lastReturned == <span class="hljs-keyword">null</span>)
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IllegalStateException();
+
+            Node&lt;E&gt; lastNext = lastReturned.next;
+            unlink(lastReturned);
+            <span class="hljs-keyword">if</span> (next == lastReturned)
+                next = lastNext;
+            <span class="hljs-keyword">else</span>
+                nextIndex--;
+            lastReturned = <span class="hljs-keyword">null</span>;
+            expectedModCount++;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">set</span><span class="hljs-params">(E e)</span> </span>&#123;
+            <span class="hljs-keyword">if</span> (lastReturned == <span class="hljs-keyword">null</span>)
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IllegalStateException();
+            checkForComodification();
+            lastReturned.item = e;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">add</span><span class="hljs-params">(E e)</span> </span>&#123;
+            checkForComodification();
+            lastReturned = <span class="hljs-keyword">null</span>;
+            <span class="hljs-keyword">if</span> (next == <span class="hljs-keyword">null</span>)
+                linkLast(e);
+            <span class="hljs-keyword">else</span>
+                linkBefore(e, next);
+            nextIndex++;
+            expectedModCount++;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">forEachRemaining</span><span class="hljs-params">(Consumer&lt;? <span class="hljs-keyword">super</span> E&gt; action)</span> </span>&#123;
+            Objects.requireNonNull(action);
+            <span class="hljs-keyword">while</span> (modCount == expectedModCount &amp;&amp; nextIndex &lt; size) &#123;
+                action.accept(next.item);
+                lastReturned = next;
+                next = next.next;
+                nextIndex++;
+            &#125;
+            checkForComodification();
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">final</span> <span class="hljs-keyword">void</span> <span class="hljs-title">checkForComodification</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">if</span> (modCount != expectedModCount)
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ConcurrentModificationException();
+        &#125;
+    &#125;
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Node</span>&lt;<span class="hljs-title">E</span>&gt; </span>&#123;
+        E item;
+        Node&lt;E&gt; next;
+        Node&lt;E&gt; prev;
+
+        Node(Node&lt;E&gt; prev, E element, Node&lt;E&gt; next) &#123;
+            <span class="hljs-keyword">this</span>.item = element;
+            <span class="hljs-keyword">this</span>.next = next;
+            <span class="hljs-keyword">this</span>.prev = prev;
+        &#125;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span> 1.6</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> Iterator&lt;E&gt; <span class="hljs-title">descendingIterator</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> DescendingIterator();
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Adapter to provide descending iterators via ListItr.previous</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DescendingIterator</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Iterator</span>&lt;<span class="hljs-title">E</span>&gt; </span>&#123;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ListItr itr = <span class="hljs-keyword">new</span> ListItr(size());
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">hasNext</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">return</span> itr.hasPrevious();
+        &#125;
+        <span class="hljs-function"><span class="hljs-keyword">public</span> E <span class="hljs-title">next</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">return</span> itr.previous();
+        &#125;
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">remove</span><span class="hljs-params">()</span> </span>&#123;
+            itr.remove();
+        &#125;
+    &#125;
+
+    <span class="hljs-meta">@SuppressWarnings</span>(<span class="hljs-string">"unchecked"</span>)
+    <span class="hljs-function"><span class="hljs-keyword">private</span> LinkedList&lt;E&gt; <span class="hljs-title">superClone</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">try</span> &#123;
+            <span class="hljs-keyword">return</span> (LinkedList&lt;E&gt;) <span class="hljs-keyword">super</span>.clone();
+        &#125; <span class="hljs-keyword">catch</span> (CloneNotSupportedException e) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> InternalError(e);
+        &#125;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Returns a shallow copy of this &#123;<span class="hljs-doctag">@code</span> LinkedList&#125;. (The elements</span>
+<span class="hljs-comment">     * themselves are not cloned.)</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@return</span> a shallow copy of this &#123;<span class="hljs-doctag">@code</span> LinkedList&#125; instance</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">clone</span><span class="hljs-params">()</span> </span>&#123;
+        LinkedList&lt;E&gt; clone = superClone();
+
+        <span class="hljs-comment">// Put clone into "virgin" state</span>
+        clone.first = clone.last = <span class="hljs-keyword">null</span>;
+        clone.size = <span class="hljs-number">0</span>;
+        clone.modCount = <span class="hljs-number">0</span>;
+
+        <span class="hljs-comment">// Initialize clone with our elements</span>
+        <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = first; x != <span class="hljs-keyword">null</span>; x = x.next)
+            clone.add(x.item);
+
+        <span class="hljs-keyword">return</span> clone;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Returns an array containing all of the elements in this list</span>
+<span class="hljs-comment">     * in proper sequence (from first to last element).</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * &lt;p&gt;The returned array will be "safe" in that no references to it are</span>
+<span class="hljs-comment">     * maintained by this list.  (In other words, this method must allocate</span>
+<span class="hljs-comment">     * a new array).  The caller is thus free to modify the returned array.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * &lt;p&gt;This method acts as bridge between array-based and collection-based</span>
+<span class="hljs-comment">     * APIs.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@return</span> an array containing all of the elements in this list</span>
+<span class="hljs-comment">     *         in proper sequence</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">public</span> Object[] toArray() &#123;
+        Object[] result = <span class="hljs-keyword">new</span> Object[size];
+        <span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = first; x != <span class="hljs-keyword">null</span>; x = x.next)
+            result[i++] = x.item;
+        <span class="hljs-keyword">return</span> result;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Returns an array containing all of the elements in this list in</span>
+<span class="hljs-comment">     * proper sequence (from first to last element); the runtime type of</span>
+<span class="hljs-comment">     * the returned array is that of the specified array.  If the list fits</span>
+<span class="hljs-comment">     * in the specified array, it is returned therein.  Otherwise, a new</span>
+<span class="hljs-comment">     * array is allocated with the runtime type of the specified array and</span>
+<span class="hljs-comment">     * the size of this list.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * &lt;p&gt;If the list fits in the specified array with room to spare (i.e.,</span>
+<span class="hljs-comment">     * the array has more elements than the list), the element in the array</span>
+<span class="hljs-comment">     * immediately following the end of the list is set to &#123;<span class="hljs-doctag">@code</span> null&#125;.</span>
+<span class="hljs-comment">     * (This is useful in determining the length of the list &lt;i&gt;only&lt;/i&gt; if</span>
+<span class="hljs-comment">     * the caller knows that the list does not contain any null elements.)</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * &lt;p&gt;Like the &#123;<span class="hljs-doctag">@link</span> #toArray()&#125; method, this method acts as bridge between</span>
+<span class="hljs-comment">     * array-based and collection-based APIs.  Further, this method allows</span>
+<span class="hljs-comment">     * precise control over the runtime type of the output array, and may,</span>
+<span class="hljs-comment">     * under certain circumstances, be used to save allocation costs.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * &lt;p&gt;Suppose &#123;<span class="hljs-doctag">@code</span> x&#125; is a list known to contain only strings.</span>
+<span class="hljs-comment">     * The following code can be used to dump the list into a newly</span>
+<span class="hljs-comment">     * allocated array of &#123;<span class="hljs-doctag">@code</span> String&#125;:</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * &lt;pre&gt;</span>
+<span class="hljs-comment">     *     String[] y = x.toArray(new String[0]);&lt;/pre&gt;</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * Note that &#123;<span class="hljs-doctag">@code</span> toArray(new Object[0])&#125; is identical in function to</span>
+<span class="hljs-comment">     * &#123;<span class="hljs-doctag">@code</span> toArray()&#125;.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@param</span> a the array into which the elements of the list are to</span>
+<span class="hljs-comment">     *          be stored, if it is big enough; otherwise, a new array of the</span>
+<span class="hljs-comment">     *          same runtime type is allocated for this purpose.</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@return</span> an array containing the elements of the list</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> ArrayStoreException if the runtime type of the specified array</span>
+<span class="hljs-comment">     *         is not a supertype of the runtime type of every element in</span>
+<span class="hljs-comment">     *         this list</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> NullPointerException if the specified array is null</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@SuppressWarnings</span>(<span class="hljs-string">"unchecked"</span>)
+    <span class="hljs-keyword">public</span> &lt;T&gt; T[] toArray(T[] a) &#123;
+        <span class="hljs-keyword">if</span> (a.length &lt; size)
+            a = (T[])java.lang.reflect.Array.newInstance(
+                                a.getClass().getComponentType(), size);
+        <span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>;
+        Object[] result = a;
+        <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = first; x != <span class="hljs-keyword">null</span>; x = x.next)
+            result[i++] = x.item;
+
+        <span class="hljs-keyword">if</span> (a.length &gt; size)
+            a[size] = <span class="hljs-keyword">null</span>;
+
+        <span class="hljs-keyword">return</span> a;
+    &#125;
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">long</span> serialVersionUID = <span class="hljs-number">876323262645176354L</span>;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Saves the state of this &#123;<span class="hljs-doctag">@code</span> LinkedList&#125; instance to a stream</span>
+<span class="hljs-comment">     * (that is, serializes it).</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@serialData</span> The size of the list (the number of elements it</span>
+<span class="hljs-comment">     *             contains) is emitted (int), followed by all of its</span>
+<span class="hljs-comment">     *             elements (each an Object) in the proper order.</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">writeObject</span><span class="hljs-params">(java.io.ObjectOutputStream s)</span></span>
+<span class="hljs-function">        <span class="hljs-keyword">throws</span> java.io.IOException </span>&#123;
+        <span class="hljs-comment">// Write out any hidden serialization magic</span>
+        s.defaultWriteObject();
+
+        <span class="hljs-comment">// Write out size</span>
+        s.writeInt(size);
+
+        <span class="hljs-comment">// Write out all elements in the proper order.</span>
+        <span class="hljs-keyword">for</span> (Node&lt;E&gt; x = first; x != <span class="hljs-keyword">null</span>; x = x.next)
+            s.writeObject(x.item);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Reconstitutes this &#123;<span class="hljs-doctag">@code</span> LinkedList&#125; instance from a stream</span>
+<span class="hljs-comment">     * (that is, deserializes it).</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@SuppressWarnings</span>(<span class="hljs-string">"unchecked"</span>)
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">readObject</span><span class="hljs-params">(java.io.ObjectInputStream s)</span></span>
+<span class="hljs-function">        <span class="hljs-keyword">throws</span> java.io.IOException, ClassNotFoundException </span>&#123;
+        <span class="hljs-comment">// Read in any hidden serialization magic</span>
+        s.defaultReadObject();
+
+        <span class="hljs-comment">// Read in size</span>
+        <span class="hljs-keyword">int</span> size = s.readInt();
+
+        <span class="hljs-comment">// Read in all elements in the proper order.</span>
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; size; i++)
+            linkLast((E)s.readObject());
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Creates a &lt;em&gt;&lt;a href="Spliterator.html#binding"&gt;late-binding&lt;/a&gt;&lt;/em&gt;</span>
+<span class="hljs-comment">     * and &lt;em&gt;fail-fast&lt;/em&gt; &#123;<span class="hljs-doctag">@link</span> Spliterator&#125; over the elements in this</span>
+<span class="hljs-comment">     * list.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * &lt;p&gt;The &#123;<span class="hljs-doctag">@code</span> Spliterator&#125; reports &#123;<span class="hljs-doctag">@link</span> Spliterator#SIZED&#125; and</span>
+<span class="hljs-comment">     * &#123;<span class="hljs-doctag">@link</span> Spliterator#ORDERED&#125;.  Overriding implementations should document</span>
+<span class="hljs-comment">     * the reporting of additional characteristic values.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@implNote</span></span>
+<span class="hljs-comment">     * The &#123;<span class="hljs-doctag">@code</span> Spliterator&#125; additionally reports &#123;<span class="hljs-doctag">@link</span> Spliterator#SUBSIZED&#125;</span>
+<span class="hljs-comment">     * and implements &#123;<span class="hljs-doctag">@code</span> trySplit&#125; to permit limited parallelism..</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@return</span> a &#123;<span class="hljs-doctag">@code</span> Spliterator&#125; over the elements in this list</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span> 1.8</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> Spliterator&lt;E&gt; <span class="hljs-title">spliterator</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> LLSpliterator&lt;E&gt;(<span class="hljs-keyword">this</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
+    &#125;
+
+    <span class="hljs-comment">/** A customized variant of Spliterators.IteratorSpliterator */</span>
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">LLSpliterator</span>&lt;<span class="hljs-title">E</span>&gt; <span class="hljs-keyword">implements</span> <span class="hljs-title">Spliterator</span>&lt;<span class="hljs-title">E</span>&gt; </span>&#123;
+        <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> BATCH_UNIT = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">10</span>;  <span class="hljs-comment">// batch array size increment</span>
+        <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> MAX_BATCH = <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">25</span>;  <span class="hljs-comment">// max batch array size;</span>
+        <span class="hljs-keyword">final</span> LinkedList&lt;E&gt; list; <span class="hljs-comment">// null OK unless traversed</span>
+        Node&lt;E&gt; current;      <span class="hljs-comment">// current node; null until initialized</span>
+        <span class="hljs-keyword">int</span> est;              <span class="hljs-comment">// size estimate; -1 until first needed</span>
+        <span class="hljs-keyword">int</span> expectedModCount; <span class="hljs-comment">// initialized when est set</span>
+        <span class="hljs-keyword">int</span> batch;            <span class="hljs-comment">// batch size for splits</span>
+
+        LLSpliterator(LinkedList&lt;E&gt; list, <span class="hljs-keyword">int</span> est, <span class="hljs-keyword">int</span> expectedModCount) &#123;
+            <span class="hljs-keyword">this</span>.list = list;
+            <span class="hljs-keyword">this</span>.est = est;
+            <span class="hljs-keyword">this</span>.expectedModCount = expectedModCount;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getEst</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">int</span> s; <span class="hljs-comment">// force initialization</span>
+            <span class="hljs-keyword">final</span> LinkedList&lt;E&gt; lst;
+            <span class="hljs-keyword">if</span> ((s = est) &lt; <span class="hljs-number">0</span>) &#123;
+                <span class="hljs-keyword">if</span> ((lst = list) == <span class="hljs-keyword">null</span>)
+                    s = est = <span class="hljs-number">0</span>;
+                <span class="hljs-keyword">else</span> &#123;
+                    expectedModCount = lst.modCount;
+                    current = lst.first;
+                    s = est = lst.size;
+                &#125;
+            &#125;
+            <span class="hljs-keyword">return</span> s;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">long</span> <span class="hljs-title">estimateSize</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> (<span class="hljs-keyword">long</span>) getEst(); &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> Spliterator&lt;E&gt; <span class="hljs-title">trySplit</span><span class="hljs-params">()</span> </span>&#123;
+            Node&lt;E&gt; p;
+            <span class="hljs-keyword">int</span> s = getEst();
+            <span class="hljs-keyword">if</span> (s &gt; <span class="hljs-number">1</span> &amp;&amp; (p = current) != <span class="hljs-keyword">null</span>) &#123;
+                <span class="hljs-keyword">int</span> n = batch + BATCH_UNIT;
+                <span class="hljs-keyword">if</span> (n &gt; s)
+                    n = s;
+                <span class="hljs-keyword">if</span> (n &gt; MAX_BATCH)
+                    n = MAX_BATCH;
+                Object[] a = <span class="hljs-keyword">new</span> Object[n];
+                <span class="hljs-keyword">int</span> j = <span class="hljs-number">0</span>;
+                <span class="hljs-keyword">do</span> &#123; a[j++] = p.item; &#125; <span class="hljs-keyword">while</span> ((p = p.next) != <span class="hljs-keyword">null</span> &amp;&amp; j &lt; n);
+                current = p;
+                batch = j;
+                est = s - j;
+                <span class="hljs-keyword">return</span> Spliterators.spliterator(a, <span class="hljs-number">0</span>, j, Spliterator.ORDERED);
+            &#125;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">forEachRemaining</span><span class="hljs-params">(Consumer&lt;? <span class="hljs-keyword">super</span> E&gt; action)</span> </span>&#123;
+            Node&lt;E&gt; p; <span class="hljs-keyword">int</span> n;
+            <span class="hljs-keyword">if</span> (action == <span class="hljs-keyword">null</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NullPointerException();
+            <span class="hljs-keyword">if</span> ((n = getEst()) &gt; <span class="hljs-number">0</span> &amp;&amp; (p = current) != <span class="hljs-keyword">null</span>) &#123;
+                current = <span class="hljs-keyword">null</span>;
+                est = <span class="hljs-number">0</span>;
+                <span class="hljs-keyword">do</span> &#123;
+                    E e = p.item;
+                    p = p.next;
+                    action.accept(e);
+                &#125; <span class="hljs-keyword">while</span> (p != <span class="hljs-keyword">null</span> &amp;&amp; --n &gt; <span class="hljs-number">0</span>);
+            &#125;
+            <span class="hljs-keyword">if</span> (list.modCount != expectedModCount)
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ConcurrentModificationException();
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">tryAdvance</span><span class="hljs-params">(Consumer&lt;? <span class="hljs-keyword">super</span> E&gt; action)</span> </span>&#123;
+            Node&lt;E&gt; p;
+            <span class="hljs-keyword">if</span> (action == <span class="hljs-keyword">null</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> NullPointerException();
+            <span class="hljs-keyword">if</span> (getEst() &gt; <span class="hljs-number">0</span> &amp;&amp; (p = current) != <span class="hljs-keyword">null</span>) &#123;
+                --est;
+                E e = p.item;
+                current = p.next;
+                action.accept(e);
+                <span class="hljs-keyword">if</span> (list.modCount != expectedModCount)
+                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ConcurrentModificationException();
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;
+            &#125;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;
+        &#125;
+
+        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">characteristics</span><span class="hljs-params">()</span> </span>&#123;
+            <span class="hljs-keyword">return</span> Spliterator.ORDERED | Spliterator.SIZED | Spliterator.SUBSIZED;
+        &#125;
+    &#125;
+
+&#125;</code></pre>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/java%E5%9F%BA%E7%A1%80/">java基础</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/LinkedList%E7%B1%BB/">LinkedList类</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/11/12/arrayList/">
+                        <span class="hidden-mobile">ArrayList探究</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <script defer src="https://utteranc.es/client.js"
+          repo="zzzyyyzhuyu/zzzyyyzhuyu.github.io"
+          issue-term="pathname"
+  
+          label="utterances"
+    
+          theme="github-light"
+          crossorigin="anonymous"
+  >
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+  <div class="col-lg-7 mx-auto nopadding-md">
+    <div class="container custom post-content mx-auto">
+      <img src="https://octodex.github.com/images/jetpacktocat.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:150px; height:150px;">
+    </div>
+  </div>
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div>
+    
+      <!-- 不蒜子统计PV -->
+      
+      <span id="busuanzi_container_site_pv" style="display: none">
+      总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    </span>
+    
+    
+      <!-- 不蒜子统计UV -->
+      
+      <span id="busuanzi_container_site_uv" style="display: none">
+      总访客数 <span id="busuanzi_value_site_uv"></span> 人
+    </span>
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "LinkedList类探究&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+  
+  
+    <script>
+      !function (e, t, a) {
+        function r() {
+          for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999");
+          requestAnimationFrame(r)
+        }
+
+        function n() {
+          var t = "function" == typeof e.onclick && e.onclick;
+          e.onclick = function (e) {
+            t && t(), o(e)
+          }
+        }
+
+        function o(e) {
+          var a = t.createElement("div");
+          a.className = "heart", s.push({
+            el: a,
+            x: e.clientX - 5,
+            y: e.clientY - 5,
+            scale: 1,
+            alpha: 1,
+            color: c()
+          }), t.body.appendChild(a)
+        }
+
+        function i(e) {
+          var a = t.createElement("style");
+          a.type = "text/css";
+          try {
+            a.appendChild(t.createTextNode(e))
+          } catch (t) {
+            a.styleSheet.cssText = e
+          }
+          t.getElementsByTagName("head")[0].appendChild(a)
+        }
+
+        function c() {
+          return "rgb(" + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + ")"
+        }
+
+        var s = [];
+        e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame || function (e) {
+          setTimeout(e, 1e3 / 60)
+        }, i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"), n(), r()
+      }(window, document);
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

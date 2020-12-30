@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/favicon.png">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="ever ever ever">
+  <meta name="author" content="Wimp">
+  <meta name="keywords" content="">
+  <title>StringBuffer类探究 - Wimp</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_fmb4a04yx8h.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Wimp</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              <i class="iconfont icon-home-fill"></i>
+              首页</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">
+              <i class="iconfont icon-archive-fill"></i>
+              归档</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">
+              <i class="iconfont icon-category-fill"></i>
+              分类</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">
+              <i class="iconfont icon-tags-fill"></i>
+              标签</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">
+              <i class="iconfont icon-user-fill"></i>
+              关于</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/links/">
+              <i class="iconfont icon-link-fill"></i>
+              友链</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/images/chihiro.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+                <div class="mt-3 post-meta">
+                  <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+                  <time datetime="2020-11-07 14:15">
+                    2020年11月7日 下午
+                  </time>
+                </div>
+              
+
+              <div class="mt-1">
+                
+                  
+                  <span class="post-meta mr-2">
+                    <i class="iconfont icon-chart"></i>
+                    3.9k 字
+                  </span>
+                
+
+                
+                  
+                  <span class="post-meta mr-2">
+                      <i class="iconfont icon-clock-fill"></i>
+                    
+                    
+                    72
+                     分钟
+                  </span>
+                
+
+                
+              </div>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2020年11月9日 早上
+                
+              </p>
+            
+            <article class="markdown-body">
+              <h1 id="StringBuffer类探究"><a href="#StringBuffer类探究" class="headerlink" title="StringBuffer类探究"></a>StringBuffer类探究</h1><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><ul>
+<li>实现自AbstractStringBuilder</li>
+<li>主要方法synchronize修饰，线程安全</li>
+<li>final类，不可继承</li>
+<li>内容可变(内部字符数组未用final)</li>
+</ul>
+<h4 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h4><h4 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h4><ul>
+<li>AbstractStringBuilder<pre><code class="hljs java"><span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AbstractStringBuilder</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Appendable</span>, <span class="hljs-title">CharSequence</span> </span>&#123;
+    <span class="hljs-comment">//字符数组，存放内容</span>
+    <span class="hljs-keyword">char</span>[] value;
+
+    <span class="hljs-comment">//已存字符个数</span>
+    <span class="hljs-keyword">int</span> count;
+
+    <span class="hljs-comment">//初始化方法</span>
+    AbstractStringBuilder() &#123;
+    &#125;
+
+    AbstractStringBuilder(<span class="hljs-keyword">int</span> capacity) &#123;
+        value = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[capacity];
+    &#125;
+    
+    <span class="hljs-comment">//返回已使用长度</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">length</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> count;
+    &#125;
+
+    <span class="hljs-comment">//数组实际长度</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">capacity</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> value.length;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Ensures that the capacity is at least equal to the specified minimum.</span>
+<span class="hljs-comment">     * If the current capacity is less than the argument, then a new internal</span>
+<span class="hljs-comment">     * array is allocated with greater capacity. The new capacity is the</span>
+<span class="hljs-comment">     * larger of:</span>
+<span class="hljs-comment">     * &lt;ul&gt;</span>
+<span class="hljs-comment">     * &lt;li&gt;The &#123;<span class="hljs-doctag">@code</span> minimumCapacity&#125; argument.</span>
+<span class="hljs-comment">     * &lt;li&gt;Twice the old capacity, plus &#123;<span class="hljs-doctag">@code</span> 2&#125;.</span>
+<span class="hljs-comment">     * &lt;/ul&gt;</span>
+<span class="hljs-comment">     * If the &#123;<span class="hljs-doctag">@code</span> minimumCapacity&#125; argument is nonpositive, this</span>
+<span class="hljs-comment">     * method takes no action and simply returns.</span>
+<span class="hljs-comment">     * Note that subsequent operations on this object can reduce the</span>
+<span class="hljs-comment">     * actual capacity below that requested here.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@param</span>   minimumCapacity   the minimum desired capacity.</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">ensureCapacity</span><span class="hljs-params">(<span class="hljs-keyword">int</span> minimumCapacity)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (minimumCapacity &gt; <span class="hljs-number">0</span>)
+            ensureCapacityInternal(minimumCapacity);
+    &#125;
+
+    <span class="hljs-comment">//内部字符数组扩容</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">ensureCapacityInternal</span><span class="hljs-params">(<span class="hljs-keyword">int</span> minimumCapacity)</span> </span>&#123;
+        <span class="hljs-comment">//给定数组大于当前数组最大长度时，进行扩容 </span>
+        <span class="hljs-keyword">if</span> (minimumCapacity - value.length &gt; <span class="hljs-number">0</span>) &#123;
+            value = Arrays.copyOf(value,
+                    newCapacity(minimumCapacity));
+        &#125;
+    &#125;
+
+    <span class="hljs-comment">//内部数组最大长度，防止 outOfMemoryException</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> MAX_ARRAY_SIZE = Integer.MAX_VALUE - <span class="hljs-number">8</span>;
+
+    <span class="hljs-comment">//根据给定最小值，获取数组大小并返回</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> <span class="hljs-title">newCapacity</span><span class="hljs-params">(<span class="hljs-keyword">int</span> minCapacity)</span> </span>&#123;
+        <span class="hljs-comment">// overflow-conscious code，2倍加2</span>
+        <span class="hljs-keyword">int</span> newCapacity = (value.length &lt;&lt; <span class="hljs-number">1</span>) + <span class="hljs-number">2</span>;
+        <span class="hljs-comment">//此处选择较大的值进行赋值</span>
+        <span class="hljs-keyword">if</span> (newCapacity - minCapacity &lt; <span class="hljs-number">0</span>) &#123;
+            newCapacity = minCapacity;
+        &#125;
+        <span class="hljs-comment">//过小或者过大进行hugeCapacity，否则使用给定值</span>
+        <span class="hljs-keyword">return</span> (newCapacity &lt;= <span class="hljs-number">0</span> || MAX_ARRAY_SIZE - newCapacity &lt; <span class="hljs-number">0</span>)
+            ? hugeCapacity(minCapacity)
+            : newCapacity;
+    &#125;
+    <span class="hljs-comment">//处理上述极值情况</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> <span class="hljs-title">hugeCapacity</span><span class="hljs-params">(<span class="hljs-keyword">int</span> minCapacity)</span> </span>&#123;
+        <span class="hljs-comment">//超过Integer最大值则抛出异常</span>
+        <span class="hljs-keyword">if</span> (Integer.MAX_VALUE - minCapacity &lt; <span class="hljs-number">0</span>) &#123; <span class="hljs-comment">// overflow</span>
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> OutOfMemoryError();
+        &#125;
+        <span class="hljs-comment">//选取较大的一个值返回</span>
+        <span class="hljs-keyword">return</span> (minCapacity &gt; MAX_ARRAY_SIZE)
+            ? minCapacity : MAX_ARRAY_SIZE;
+    &#125;
+
+    <span class="hljs-comment">//去除未使用空间</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">trimToSize</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (count &lt; value.length) &#123;
+            value = Arrays.copyOf(value, count);
+        &#125;
+    &#125;
+
+    <span class="hljs-comment">//设置长度大小</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setLength</span><span class="hljs-params">(<span class="hljs-keyword">int</span> newLength)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (newLength &lt; <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(newLength);
+        <span class="hljs-comment">//此处确保数组容量满足新长度，不足会进行扩容</span>
+        ensureCapacityInternal(newLength);
+
+        <span class="hljs-keyword">if</span> (count &lt; newLength) &#123;
+            <span class="hljs-comment">//超过长度范围进行补'\0'</span>
+            Arrays.fill(value, count, newLength, <span class="hljs-string">'\0'</span>);
+        &#125;
+
+        count = newLength;
+    &#125;
+
+    <span class="hljs-comment">//返回给定下标的值(char类型)</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">char</span> <span class="hljs-title">charAt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> ((index &lt; <span class="hljs-number">0</span>) || (index &gt;= count))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        <span class="hljs-keyword">return</span> value[index];
+    &#125;
+
+    <span class="hljs-comment">//返回给定下标ASCII码值</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">codePointAt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> ((index &lt; <span class="hljs-number">0</span>) || (index &gt;= count)) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        &#125;
+        <span class="hljs-keyword">return</span> Character.codePointAtImpl(value, index, count);
+    &#125;
+
+    <span class="hljs-comment">//返回给定下标之前的码值</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">codePointBefore</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">int</span> i = index - <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">if</span> ((i &lt; <span class="hljs-number">0</span>) || (i &gt;= count)) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        &#125;
+        <span class="hljs-keyword">return</span> Character.codePointBeforeImpl(value, index, <span class="hljs-number">0</span>);
+    &#125;
+
+    <span class="hljs-comment">//计数</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">codePointCount</span><span class="hljs-params">(<span class="hljs-keyword">int</span> beginIndex, <span class="hljs-keyword">int</span> endIndex)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (beginIndex &lt; <span class="hljs-number">0</span> || endIndex &gt; count || beginIndex &gt; endIndex) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IndexOutOfBoundsException();
+        &#125;
+        <span class="hljs-keyword">return</span> Character.codePointCountImpl(value, beginIndex, endIndex-beginIndex);
+    &#125;
+
+    <span class="hljs-comment">//偏移量</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">offsetByCodePoints</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index, <span class="hljs-keyword">int</span> codePointOffset)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (index &lt; <span class="hljs-number">0</span> || index &gt; count) &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IndexOutOfBoundsException();
+        &#125;
+        <span class="hljs-keyword">return</span> Character.offsetByCodePointsImpl(value, <span class="hljs-number">0</span>, count,
+                                                index, codePointOffset);
+    &#125;
+
+    <span class="hljs-comment">//字符数组复制</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">getChars</span><span class="hljs-params">(<span class="hljs-keyword">int</span> srcBegin, <span class="hljs-keyword">int</span> srcEnd, <span class="hljs-keyword">char</span>[] dst, <span class="hljs-keyword">int</span> dstBegin)</span></span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">if</span> (srcBegin &lt; <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(srcBegin);
+        <span class="hljs-keyword">if</span> ((srcEnd &lt; <span class="hljs-number">0</span>) || (srcEnd &gt; count))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(srcEnd);
+        <span class="hljs-keyword">if</span> (srcBegin &gt; srcEnd)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(<span class="hljs-string">"srcBegin &gt; srcEnd"</span>);
+        System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
+    &#125;
+
+    <span class="hljs-comment">//制定下标赋值</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setCharAt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index, <span class="hljs-keyword">char</span> ch)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> ((index &lt; <span class="hljs-number">0</span>) || (index &gt;= count))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        value[index] = ch;
+    &#125;
+
+    <span class="hljs-comment">//添加对象</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(Object obj)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> append(String.valueOf(obj));
+    &#125;
+
+    <span class="hljs-comment">//新增字符串</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(String str)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (str == <span class="hljs-keyword">null</span>)
+            <span class="hljs-keyword">return</span> appendNull();
+        <span class="hljs-keyword">int</span> len = str.length();
+        <span class="hljs-comment">//确保长度足够添加，不够则进行扩容</span>
+        ensureCapacityInternal(count + len);
+        <span class="hljs-comment">//char数组复制</span>
+        str.getChars(<span class="hljs-number">0</span>, len, value, count);
+        <span class="hljs-comment">//更新当前数组已用长度</span>
+        count += len;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">//尾部添加StringBuffer串</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(StringBuffer sb)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (sb == <span class="hljs-keyword">null</span>)
+            <span class="hljs-keyword">return</span> appendNull();
+        <span class="hljs-keyword">int</span> len = sb.length();
+        ensureCapacityInternal(count + len);
+        sb.getChars(<span class="hljs-number">0</span>, len, value, count);
+        count += len;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">//尾部添加AbstractStringBuilder串</span>
+    <span class="hljs-function">AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(AbstractStringBuilder asb)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (asb == <span class="hljs-keyword">null</span>)
+            <span class="hljs-keyword">return</span> appendNull();
+        <span class="hljs-keyword">int</span> len = asb.length();
+        ensureCapacityInternal(count + len);
+        asb.getChars(<span class="hljs-number">0</span>, len, value, count);
+        count += len;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(CharSequence s)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (s == <span class="hljs-keyword">null</span>)
+            <span class="hljs-keyword">return</span> appendNull();
+        <span class="hljs-keyword">if</span> (s <span class="hljs-keyword">instanceof</span> String)
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.append((String)s);
+        <span class="hljs-keyword">if</span> (s <span class="hljs-keyword">instanceof</span> AbstractStringBuilder)
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.append((AbstractStringBuilder)s);
+
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.append(s, <span class="hljs-number">0</span>, s.length());
+    &#125;
+    <span class="hljs-comment">//添加空值</span>
+    <span class="hljs-function"><span class="hljs-keyword">private</span> AbstractStringBuilder <span class="hljs-title">appendNull</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">int</span> c = count;
+        ensureCapacityInternal(c + <span class="hljs-number">4</span>);
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">char</span>[] value = <span class="hljs-keyword">this</span>.value;
+        value[c++] = <span class="hljs-string">'n'</span>;
+        value[c++] = <span class="hljs-string">'u'</span>;
+        value[c++] = <span class="hljs-string">'l'</span>;
+        value[c++] = <span class="hljs-string">'l'</span>;
+        count = c;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+    
+    <span class="hljs-comment">//添加串的指定位置</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(CharSequence s, <span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (s == <span class="hljs-keyword">null</span>)
+            s = <span class="hljs-string">"null"</span>;
+        <span class="hljs-keyword">if</span> ((start &lt; <span class="hljs-number">0</span>) || (start &gt; end) || (end &gt; s.length()))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IndexOutOfBoundsException(
+                <span class="hljs-string">"start "</span> + start + <span class="hljs-string">", end "</span> + end + <span class="hljs-string">", s.length() "</span>
+                + s.length());
+        <span class="hljs-keyword">int</span> len = end - start;
+        ensureCapacityInternal(count + len);
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = start, j = count; i &lt; end; i++, j++)
+            value[j] = s.charAt(i);
+        count += len;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">//添加字符数组</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">char</span>[] str)</span> </span>&#123;
+        <span class="hljs-keyword">int</span> len = str.length;
+        ensureCapacityInternal(count + len);
+        System.arraycopy(str, <span class="hljs-number">0</span>, value, count, len);
+        count += len;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">char</span> str[], <span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> len)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (len &gt; <span class="hljs-number">0</span>)                <span class="hljs-comment">// let arraycopy report AIOOBE for len &lt; 0</span>
+            ensureCapacityInternal(count + len);
+        System.arraycopy(str, offset, value, count, len);
+        count += len;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">boolean</span> b)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (b) &#123;
+            ensureCapacityInternal(count + <span class="hljs-number">4</span>);
+            value[count++] = <span class="hljs-string">'t'</span>;
+            value[count++] = <span class="hljs-string">'r'</span>;
+            value[count++] = <span class="hljs-string">'u'</span>;
+            value[count++] = <span class="hljs-string">'e'</span>;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            ensureCapacityInternal(count + <span class="hljs-number">5</span>);
+            value[count++] = <span class="hljs-string">'f'</span>;
+            value[count++] = <span class="hljs-string">'a'</span>;
+            value[count++] = <span class="hljs-string">'l'</span>;
+            value[count++] = <span class="hljs-string">'s'</span>;
+            value[count++] = <span class="hljs-string">'e'</span>;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+   
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">char</span> c)</span> </span>&#123;
+        ensureCapacityInternal(count + <span class="hljs-number">1</span>);
+        value[count++] = c;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+    
+    <span class="hljs-comment">//添加int数值</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i)</span> </span>&#123;
+        <span class="hljs-comment">//最值判断</span>
+        <span class="hljs-keyword">if</span> (i == Integer.MIN_VALUE) &#123;
+            append(<span class="hljs-string">"-2147483648"</span>);
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+        &#125;
+        <span class="hljs-keyword">int</span> appendedLength = (i &lt; <span class="hljs-number">0</span>) ? Integer.stringSize(-i) + <span class="hljs-number">1</span>
+                                     : Integer.stringSize(i);
+        <span class="hljs-keyword">int</span> spaceNeeded = count + appendedLength;
+        ensureCapacityInternal(spaceNeeded);
+        Integer.getChars(i, spaceNeeded, value);
+        count = spaceNeeded;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">long</span> l)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (l == Long.MIN_VALUE) &#123;
+            append(<span class="hljs-string">"-9223372036854775808"</span>);
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+        &#125;
+        <span class="hljs-keyword">int</span> appendedLength = (l &lt; <span class="hljs-number">0</span>) ? Long.stringSize(-l) + <span class="hljs-number">1</span>
+                                     : Long.stringSize(l);
+        <span class="hljs-keyword">int</span> spaceNeeded = count + appendedLength;
+        ensureCapacityInternal(spaceNeeded);
+        Long.getChars(l, spaceNeeded, value);
+        count = spaceNeeded;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+ 
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">float</span> f)</span> </span>&#123;
+        FloatingDecimal.appendTo(f,<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">double</span> d)</span> </span>&#123;
+        FloatingDecimal.appendTo(d,<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">delete</span><span class="hljs-params">(<span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (start &lt; <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(start);
+        <span class="hljs-keyword">if</span> (end &gt; count)
+            end = count;
+        <span class="hljs-keyword">if</span> (start &gt; end)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException();
+        <span class="hljs-keyword">int</span> len = end - start;
+        <span class="hljs-keyword">if</span> (len &gt; <span class="hljs-number">0</span>) &#123;
+            System.arraycopy(value, start+len, value, start, count-end);
+            count -= len;
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">appendCodePoint</span><span class="hljs-params">(<span class="hljs-keyword">int</span> codePoint)</span> </span>&#123;
+        <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> count = <span class="hljs-keyword">this</span>.count;
+
+        <span class="hljs-keyword">if</span> (Character.isBmpCodePoint(codePoint)) &#123;
+            ensureCapacityInternal(count + <span class="hljs-number">1</span>);
+            value[count] = (<span class="hljs-keyword">char</span>) codePoint;
+            <span class="hljs-keyword">this</span>.count = count + <span class="hljs-number">1</span>;
+        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (Character.isValidCodePoint(codePoint)) &#123;
+            ensureCapacityInternal(count + <span class="hljs-number">2</span>);
+            Character.toSurrogates(codePoint, value, count);
+            <span class="hljs-keyword">this</span>.count = count + <span class="hljs-number">2</span>;
+        &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IllegalArgumentException();
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">//删除其中某一个字符，本质是数组的平移</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">deleteCharAt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> ((index &lt; <span class="hljs-number">0</span>) || (index &gt;= count))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        System.arraycopy(value, index+<span class="hljs-number">1</span>, value, index, count-index-<span class="hljs-number">1</span>);
+        count--;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">//替换指定位置字符串</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">replace</span><span class="hljs-params">(<span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end, String str)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (start &lt; <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(start);
+        <span class="hljs-keyword">if</span> (start &gt; count)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(<span class="hljs-string">"start &gt; length()"</span>);
+        <span class="hljs-keyword">if</span> (start &gt; end)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(<span class="hljs-string">"start &gt; end"</span>);
+
+        <span class="hljs-keyword">if</span> (end &gt; count)
+            end = count;
+        <span class="hljs-keyword">int</span> len = str.length();
+        <span class="hljs-keyword">int</span> newCount = count + len - (end - start);
+        ensureCapacityInternal(newCount);
+
+        System.arraycopy(value, end, value, start + len, count - end);
+        str.getChars(value, start);
+        count = newCount;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">//字符切割</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">substring</span><span class="hljs-params">(<span class="hljs-keyword">int</span> start)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> substring(start, count);
+    &#125;
+
+    
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> CharSequence <span class="hljs-title">subSequence</span><span class="hljs-params">(<span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> substring(start, end);
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">substring</span><span class="hljs-params">(<span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (start &lt; <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(start);
+        <span class="hljs-keyword">if</span> (end &gt; count)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(end);
+        <span class="hljs-keyword">if</span> (start &gt; end)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(end - start);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(value, start, end - start);
+    &#125;
+
+    <span class="hljs-comment">//字符插入</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index, <span class="hljs-keyword">char</span>[] str, <span class="hljs-keyword">int</span> offset,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                        <span class="hljs-keyword">int</span> len)</span></span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">if</span> ((index &lt; <span class="hljs-number">0</span>) || (index &gt; length()))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        <span class="hljs-keyword">if</span> ((offset &lt; <span class="hljs-number">0</span>) || (len &lt; <span class="hljs-number">0</span>) || (offset &gt; str.length - len))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(
+                <span class="hljs-string">"offset "</span> + offset + <span class="hljs-string">", len "</span> + len + <span class="hljs-string">", str.length "</span>
+                + str.length);
+        ensureCapacityInternal(count + len);
+        System.arraycopy(value, index, value, index + len, count - index);
+        System.arraycopy(str, offset, value, index, len);
+        count += len;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, Object obj)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> insert(offset, String.valueOf(obj));
+    &#125;
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, String str)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> ((offset &lt; <span class="hljs-number">0</span>) || (offset &gt; length()))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(offset);
+        <span class="hljs-keyword">if</span> (str == <span class="hljs-keyword">null</span>)
+            str = <span class="hljs-string">"null"</span>;
+        <span class="hljs-keyword">int</span> len = str.length();
+        <span class="hljs-comment">//扩容</span>
+        ensureCapacityInternal(count + len);
+        <span class="hljs-comment">//offset开始字符插入 value的len长度之后</span>
+        System.arraycopy(value, offset, value, offset + len, count - offset);
+        <span class="hljs-comment">//空出空间存放str</span>
+        str.getChars(value, offset);
+        count += len;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">char</span>[] str)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> ((offset &lt; <span class="hljs-number">0</span>) || (offset &gt; length()))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(offset);
+        <span class="hljs-keyword">int</span> len = str.length;
+        ensureCapacityInternal(count + len);
+        System.arraycopy(value, offset, value, offset + len, count - offset);
+        System.arraycopy(str, <span class="hljs-number">0</span>, value, offset, len);
+        count += len;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> dstOffset, CharSequence s)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (s == <span class="hljs-keyword">null</span>)
+            s = <span class="hljs-string">"null"</span>;
+        <span class="hljs-keyword">if</span> (s <span class="hljs-keyword">instanceof</span> String)
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.insert(dstOffset, (String)s);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.insert(dstOffset, s, <span class="hljs-number">0</span>, s.length());
+    &#125;
+
+    
+     <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> dstOffset, CharSequence s,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                         <span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (s == <span class="hljs-keyword">null</span>)
+            s = <span class="hljs-string">"null"</span>;
+        <span class="hljs-keyword">if</span> ((dstOffset &lt; <span class="hljs-number">0</span>) || (dstOffset &gt; <span class="hljs-keyword">this</span>.length()))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IndexOutOfBoundsException(<span class="hljs-string">"dstOffset "</span>+dstOffset);
+        <span class="hljs-keyword">if</span> ((start &lt; <span class="hljs-number">0</span>) || (end &lt; <span class="hljs-number">0</span>) || (start &gt; end) || (end &gt; s.length()))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> IndexOutOfBoundsException(
+                <span class="hljs-string">"start "</span> + start + <span class="hljs-string">", end "</span> + end + <span class="hljs-string">", s.length() "</span>
+                + s.length());
+        <span class="hljs-keyword">int</span> len = end - start;
+        ensureCapacityInternal(count + len);
+        System.arraycopy(value, dstOffset, value, dstOffset + len,
+                         count - dstOffset);
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i=start; i&lt;end; i++)
+            value[dstOffset++] = s.charAt(i);
+        count += len;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">boolean</span> b)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> insert(offset, String.valueOf(b));
+    &#125;
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">char</span> c)</span> </span>&#123;
+        ensureCapacityInternal(count + <span class="hljs-number">1</span>);
+        System.arraycopy(value, offset, value, offset + <span class="hljs-number">1</span>, count - offset);
+        value[offset] = c;
+        count += <span class="hljs-number">1</span>;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> i)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> insert(offset, String.valueOf(i));
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">long</span> l)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> insert(offset, String.valueOf(l));
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">float</span> f)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> insert(offset, String.valueOf(f));
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">double</span> d)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> insert(offset, String.valueOf(d));
+    &#125;
+
+    <span class="hljs-comment">//获取str首次出现的下标</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(String str)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> indexOf(str, <span class="hljs-number">0</span>);
+    &#125;
+
+    <span class="hljs-comment">//调用Str数组的方法</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(String str, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> String.indexOf(value, <span class="hljs-number">0</span>, count, str, fromIndex);
+    &#125;
+    
+    <span class="hljs-comment">//获取最后出现位置</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(String str)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> lastIndexOf(str, count);
+    &#125;
+
+  
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(String str, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> String.lastIndexOf(value, <span class="hljs-number">0</span>, count, str, fromIndex);
+    &#125;
+
+    <span class="hljs-comment">//字符数组反转</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> AbstractStringBuilder <span class="hljs-title">reverse</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">boolean</span> hasSurrogates = <span class="hljs-keyword">false</span>;
+        <span class="hljs-keyword">int</span> n = count - <span class="hljs-number">1</span>;
+        <span class="hljs-comment">//从中间开始左右反转</span>
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> j = (n-<span class="hljs-number">1</span>) &gt;&gt; <span class="hljs-number">1</span>; j &gt;= <span class="hljs-number">0</span>; j--) &#123;
+            <span class="hljs-keyword">int</span> k = n - j;
+            <span class="hljs-keyword">char</span> cj = value[j];
+            <span class="hljs-keyword">char</span> ck = value[k];
+            value[j] = ck;
+            value[k] = cj;
+            <span class="hljs-comment">//存在编码</span>
+            <span class="hljs-keyword">if</span> (Character.isSurrogate(cj) ||
+                Character.isSurrogate(ck)) &#123;
+                hasSurrogates = <span class="hljs-keyword">true</span>;
+            &#125;
+        &#125;
+        <span class="hljs-comment">//相关编码进行翻转</span>
+        <span class="hljs-keyword">if</span> (hasSurrogates) &#123;
+            reverseAllValidSurrogatePairs();
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">reverseAllValidSurrogatePairs</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; count - <span class="hljs-number">1</span>; i++) &#123;
+            <span class="hljs-keyword">char</span> c2 = value[i];
+            <span class="hljs-keyword">if</span> (Character.isLowSurrogate(c2)) &#123;
+                <span class="hljs-keyword">char</span> c1 = value[i + <span class="hljs-number">1</span>];
+                <span class="hljs-keyword">if</span> (Character.isHighSurrogate(c1)) &#123;
+                    value[i++] = c1;
+                    value[i] = c2;
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+
+   
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> String <span class="hljs-title">toString</span><span class="hljs-params">()</span></span>;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Needed by &#123;<span class="hljs-doctag">@code</span> String&#125; for the contentEquals method.</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-keyword">final</span> <span class="hljs-keyword">char</span>[] getValue() &#123;
+        <span class="hljs-keyword">return</span> value;
+    &#125;
+
+&#125;</code></pre>
+
+
+</li>
+</ul>
+<ul>
+<li>StringBuffer类<pre><code class="hljs java">    
+ <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StringBuffer</span></span>
+<span class="hljs-class">    <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractStringBuilder</span></span>
+<span class="hljs-class">    <span class="hljs-keyword">implements</span> <span class="hljs-title">java</span>.<span class="hljs-title">io</span>.<span class="hljs-title">Serializable</span>, <span class="hljs-title">CharSequence</span></span>
+<span class="hljs-class"></span>&#123;
+
+    <span class="hljs-comment">//缓存数组，当值变动时修改</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">transient</span> <span class="hljs-keyword">char</span>[] toStringCache;
+    
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">long</span> serialVersionUID = <span class="hljs-number">3388685877147921107L</span>;
+
+    <span class="hljs-comment">//初始化，默认大小16</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">StringBuffer</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">super</span>(<span class="hljs-number">16</span>);
+    &#125;
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">StringBuffer</span><span class="hljs-params">(<span class="hljs-keyword">int</span> capacity)</span> </span>&#123;
+        <span class="hljs-keyword">super</span>(capacity);
+    &#125;
+
+    <span class="hljs-comment">//带值初始化时，大小为16+串长度</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">StringBuffer</span><span class="hljs-params">(String str)</span> </span>&#123;
+        <span class="hljs-keyword">super</span>(str.length() + <span class="hljs-number">16</span>);
+        append(str);
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">StringBuffer</span><span class="hljs-params">(CharSequence seq)</span> </span>&#123;
+        <span class="hljs-keyword">this</span>(seq.length() + <span class="hljs-number">16</span>);
+        append(seq);
+    &#125;
+    
+    <span class="hljs-comment">//同步方法，获取长度</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">int</span> <span class="hljs-title">length</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> count;
+    &#125;
+    
+    <span class="hljs-comment">//同步方法，获取容量</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">int</span> <span class="hljs-title">capacity</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> value.length;
+    &#125;
+
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title">ensureCapacity</span><span class="hljs-params">(<span class="hljs-keyword">int</span> minimumCapacity)</span> </span>&#123;
+        <span class="hljs-keyword">super</span>.ensureCapacity(minimumCapacity);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title">trimToSize</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">super</span>.trimToSize();
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@see</span>        #length()</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setLength</span><span class="hljs-params">(<span class="hljs-keyword">int</span> newLength)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.setLength(newLength);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@see</span>        #length()</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">char</span> <span class="hljs-title">charAt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> ((index &lt; <span class="hljs-number">0</span>) || (index &gt;= count))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        <span class="hljs-keyword">return</span> value[index];
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">int</span> <span class="hljs-title">codePointAt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.codePointAt(index);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>     1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">int</span> <span class="hljs-title">codePointBefore</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.codePointBefore(index);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>     1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">int</span> <span class="hljs-title">codePointCount</span><span class="hljs-params">(<span class="hljs-keyword">int</span> beginIndex, <span class="hljs-keyword">int</span> endIndex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.codePointCount(beginIndex, endIndex);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>     1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">int</span> <span class="hljs-title">offsetByCodePoints</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index, <span class="hljs-keyword">int</span> codePointOffset)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.offsetByCodePoints(index, codePointOffset);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title">getChars</span><span class="hljs-params">(<span class="hljs-keyword">int</span> srcBegin, <span class="hljs-keyword">int</span> srcEnd, <span class="hljs-keyword">char</span>[] dst,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                      <span class="hljs-keyword">int</span> dstBegin)</span></span>
+<span class="hljs-function">    </span>&#123;
+        <span class="hljs-keyword">super</span>.getChars(srcBegin, srcEnd, dst, dstBegin);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@see</span>        #length()</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setCharAt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index, <span class="hljs-keyword">char</span> ch)</span> </span>&#123;
+        <span class="hljs-keyword">if</span> ((index &lt; <span class="hljs-number">0</span>) || (index &gt;= count))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> StringIndexOutOfBoundsException(index);
+        toStringCache = <span class="hljs-keyword">null</span>;
+        value[index] = ch;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(Object obj)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(String.valueOf(obj));
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(String str)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(str);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+  
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(StringBuffer sb)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(sb);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span> 1.8</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(AbstractStringBuilder asb)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(asb);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * Appends the specified &#123;<span class="hljs-doctag">@code</span> CharSequence&#125; to this</span>
+<span class="hljs-comment">     * sequence.</span>
+<span class="hljs-comment">     * &lt;p&gt;</span>
+<span class="hljs-comment">     * The characters of the &#123;<span class="hljs-doctag">@code</span> CharSequence&#125; argument are appended,</span>
+<span class="hljs-comment">     * in order, increasing the length of this sequence by the length of the</span>
+<span class="hljs-comment">     * argument.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * &lt;p&gt;The result of this method is exactly the same as if it were an</span>
+<span class="hljs-comment">     * invocation of this.append(s, 0, s.length());</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * &lt;p&gt;This method synchronizes on &#123;<span class="hljs-doctag">@code</span> this&#125;, the destination</span>
+<span class="hljs-comment">     * object, but does not synchronize on the source (&#123;<span class="hljs-doctag">@code</span> s&#125;).</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * &lt;p&gt;If &#123;<span class="hljs-doctag">@code</span> s&#125; is &#123;<span class="hljs-doctag">@code</span> null&#125;, then the four characters</span>
+<span class="hljs-comment">     * &#123;<span class="hljs-doctag">@code</span> "null"&#125; are appended.</span>
+<span class="hljs-comment">     *</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@param</span>   s the &#123;<span class="hljs-doctag">@code</span> CharSequence&#125; to append.</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@return</span>  a reference to this object.</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span> 1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(CharSequence s)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(s);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(CharSequence s, <span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end)</span></span>
+<span class="hljs-function">    </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(s, start, end);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">char</span>[] str)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(str);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">char</span>[] str, <span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> len)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(str, offset, len);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">boolean</span> b)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(b);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">char</span> c)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(c);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">int</span> i)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(i);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span> 1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">appendCodePoint</span><span class="hljs-params">(<span class="hljs-keyword">int</span> codePoint)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.appendCodePoint(codePoint);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">long</span> lng)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(lng);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">float</span> f)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(f);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">append</span><span class="hljs-params">(<span class="hljs-keyword">double</span> d)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.append(d);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.2</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">delete</span><span class="hljs-params">(<span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.delete(start, end);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.2</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">deleteCharAt</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.deleteCharAt(index);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.2</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">replace</span><span class="hljs-params">(<span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end, String str)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.replace(start, end, str);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.2</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> String <span class="hljs-title">substring</span><span class="hljs-params">(<span class="hljs-keyword">int</span> start)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> substring(start, count);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.4</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> CharSequence <span class="hljs-title">subSequence</span><span class="hljs-params">(<span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.substring(start, end);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.2</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> String <span class="hljs-title">substring</span><span class="hljs-params">(<span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.substring(start, end);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.2</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> index, <span class="hljs-keyword">char</span>[] str, <span class="hljs-keyword">int</span> offset,</span></span>
+<span class="hljs-function"><span class="hljs-params">                                            <span class="hljs-keyword">int</span> len)</span></span>
+<span class="hljs-function">    </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.insert(index, str, offset, len);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, Object obj)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.insert(offset, String.valueOf(obj));
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, String str)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.insert(offset, str);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">char</span>[] str)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.insert(offset, str);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> dstOffset, CharSequence s)</span> </span>&#123;
+        <span class="hljs-comment">// Note, synchronization achieved via invocations of other StringBuffer methods</span>
+        <span class="hljs-comment">// after narrowing of s to specific type</span>
+        <span class="hljs-comment">// Ditto for toStringCache clearing</span>
+        <span class="hljs-keyword">super</span>.insert(dstOffset, s);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.5</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> dstOffset, CharSequence s,</span></span>
+<span class="hljs-function"><span class="hljs-params">            <span class="hljs-keyword">int</span> start, <span class="hljs-keyword">int</span> end)</span></span>
+<span class="hljs-function">    </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.insert(dstOffset, s, start, end);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span>  StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">boolean</span> b)</span> </span>&#123;
+        <span class="hljs-comment">// Note, synchronization achieved via invocation of StringBuffer insert(int, String)</span>
+        <span class="hljs-comment">// after conversion of b to String by super class method</span>
+        <span class="hljs-comment">// Ditto for toStringCache clearing</span>
+        <span class="hljs-keyword">super</span>.insert(offset, b);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> IndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">char</span> c)</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.insert(offset, c);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">int</span> i)</span> </span>&#123;
+        <span class="hljs-comment">// Note, synchronization achieved via invocation of StringBuffer insert(int, String)</span>
+        <span class="hljs-comment">// after conversion of i to String by super class method</span>
+        <span class="hljs-comment">// Ditto for toStringCache clearing</span>
+        <span class="hljs-keyword">super</span>.insert(offset, i);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">long</span> l)</span> </span>&#123;
+        <span class="hljs-comment">// Note, synchronization achieved via invocation of StringBuffer insert(int, String)</span>
+        <span class="hljs-comment">// after conversion of l to String by super class method</span>
+        <span class="hljs-comment">// Ditto for toStringCache clearing</span>
+        <span class="hljs-keyword">super</span>.insert(offset, l);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">float</span> f)</span> </span>&#123;
+        <span class="hljs-comment">// Note, synchronization achieved via invocation of StringBuffer insert(int, String)</span>
+        <span class="hljs-comment">// after conversion of f to String by super class method</span>
+        <span class="hljs-comment">// Ditto for toStringCache clearing</span>
+        <span class="hljs-keyword">super</span>.insert(offset, f);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@throws</span> StringIndexOutOfBoundsException &#123;<span class="hljs-doctag">@inheritDoc</span>&#125;</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> StringBuffer <span class="hljs-title">insert</span><span class="hljs-params">(<span class="hljs-keyword">int</span> offset, <span class="hljs-keyword">double</span> d)</span> </span>&#123;
+        <span class="hljs-comment">// Note, synchronization achieved via invocation of StringBuffer insert(int, String)</span>
+        <span class="hljs-comment">// after conversion of d to String by super class method</span>
+        <span class="hljs-comment">// Ditto for toStringCache clearing</span>
+        <span class="hljs-keyword">super</span>.insert(offset, d);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.4</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(String str)</span> </span>&#123;
+        <span class="hljs-comment">// Note, synchronization achieved via invocations of other StringBuffer methods</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.indexOf(str);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.4</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">int</span> <span class="hljs-title">indexOf</span><span class="hljs-params">(String str, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.indexOf(str, fromIndex);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.4</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(String str)</span> </span>&#123;
+        <span class="hljs-comment">// Note, synchronization achieved via invocations of other StringBuffer methods</span>
+        <span class="hljs-keyword">return</span> lastIndexOf(str, count);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>      1.4</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastIndexOf</span><span class="hljs-params">(String str, <span class="hljs-keyword">int</span> fromIndex)</span> </span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.lastIndexOf(str, fromIndex);
+    &#125;
+
+    <span class="hljs-comment">/**</span>
+<span class="hljs-comment">     * <span class="hljs-doctag">@since</span>   JDK1.0.2</span>
+<span class="hljs-comment">     */</span>
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> StringBuffer <span class="hljs-title">reverse</span><span class="hljs-params">()</span> </span>&#123;
+        toStringCache = <span class="hljs-keyword">null</span>;
+        <span class="hljs-keyword">super</span>.reverse();
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+    &#125;
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> String <span class="hljs-title">toString</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">if</span> (toStringCache == <span class="hljs-keyword">null</span>) &#123;
+            toStringCache = Arrays.copyOfRange(value, <span class="hljs-number">0</span>, count);
+        &#125;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> String(toStringCache, <span class="hljs-keyword">true</span>);
+    &#125;
+
+    <span class="hljs-comment">//序列化相关方法</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> java.io.ObjectStreamField[] serialPersistentFields =
+    &#123;
+        <span class="hljs-keyword">new</span> java.io.ObjectStreamField(<span class="hljs-string">"value"</span>, <span class="hljs-keyword">char</span>[]<span class="hljs-class">.<span class="hljs-keyword">class</span>),</span>
+        new java.io.ObjectStreamField("count", Integer.TYPE),
+        <span class="hljs-keyword">new</span> java.io.ObjectStreamField(<span class="hljs-string">"shared"</span>, Boolean.TYPE),
+    &#125;;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title">writeObject</span><span class="hljs-params">(java.io.ObjectOutputStream s)</span></span>
+<span class="hljs-function">        <span class="hljs-keyword">throws</span> java.io.IOException </span>&#123;
+        java.io.ObjectOutputStream.PutField fields = s.putFields();
+        fields.put(<span class="hljs-string">"value"</span>, value);
+        fields.put(<span class="hljs-string">"count"</span>, count);
+        fields.put(<span class="hljs-string">"shared"</span>, <span class="hljs-keyword">false</span>);
+        s.writeFields();
+    &#125;
+
+   
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">readObject</span><span class="hljs-params">(java.io.ObjectInputStream s)</span></span>
+<span class="hljs-function">        <span class="hljs-keyword">throws</span> java.io.IOException, ClassNotFoundException </span>&#123;
+        java.io.ObjectInputStream.GetField fields = s.readFields();
+        value = (<span class="hljs-keyword">char</span>[])fields.get(<span class="hljs-string">"value"</span>, <span class="hljs-keyword">null</span>);
+        count = fields.get(<span class="hljs-string">"count"</span>, <span class="hljs-number">0</span>);
+    &#125;
+&#125;</code></pre>
+
+</li>
+</ul>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/java%E5%9F%BA%E7%A1%80/">java基础</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/StringBuffer%E7%B1%BB/">StringBuffer类</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/11/09/stringBuilder/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">StringBuilder类探究</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/11/06/string/">
+                        <span class="hidden-mobile">String类探究</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <script defer src="https://utteranc.es/client.js"
+          repo="zzzyyyzhuyu/zzzyyyzhuyu.github.io"
+          issue-term="pathname"
+  
+          label="utterances"
+    
+          theme="github-light"
+          crossorigin="anonymous"
+  >
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+  <div class="col-lg-7 mx-auto nopadding-md">
+    <div class="container custom post-content mx-auto">
+      <img src="https://octodex.github.com/images/jetpacktocat.png" srcset="/img/loading.gif" class="rounded mx-auto d-block mt-5" style="width:150px; height:150px;">
+    </div>
+  </div>
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div>
+    
+      <!-- 不蒜子统计PV -->
+      
+      <span id="busuanzi_container_site_pv" style="display: none">
+      总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    </span>
+    
+    
+      <!-- 不蒜子统计UV -->
+      
+      <span id="busuanzi_container_site_uv" style="display: none">
+      总访客数 <span id="busuanzi_value_site_uv"></span> 人
+    </span>
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "StringBuffer类探究&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+      icon: "❡"
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+  
+  
+    <script>
+      !function (e, t, a) {
+        function r() {
+          for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999");
+          requestAnimationFrame(r)
+        }
+
+        function n() {
+          var t = "function" == typeof e.onclick && e.onclick;
+          e.onclick = function (e) {
+            t && t(), o(e)
+          }
+        }
+
+        function o(e) {
+          var a = t.createElement("div");
+          a.className = "heart", s.push({
+            el: a,
+            x: e.clientX - 5,
+            y: e.clientY - 5,
+            scale: 1,
+            alpha: 1,
+            color: c()
+          }), t.body.appendChild(a)
+        }
+
+        function i(e) {
+          var a = t.createElement("style");
+          a.type = "text/css";
+          try {
+            a.appendChild(t.createTextNode(e))
+          } catch (t) {
+            a.styleSheet.cssText = e
+          }
+          t.getElementsByTagName("head")[0].appendChild(a)
+        }
+
+        function c() {
+          return "rgb(" + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + ")"
+        }
+
+        var s = [];
+        e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame || function (e) {
+          setTimeout(e, 1e3 / 60)
+        }, i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"), n(), r()
+      }(window, document);
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
